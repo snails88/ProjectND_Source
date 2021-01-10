@@ -40,6 +40,9 @@ Thumbs.db
 *.exe
 *.war
 
+# Unity3D generated meta files
+*.meta
+
 # Large media files
 *.mp4
 *.tiff
