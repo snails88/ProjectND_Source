@@ -40,6 +40,7 @@ public class CPlayer : MonoBehaviour, ICollisionObject
 
     private void Awake()
     {
+        gameObject.name = "Player";
         _wait = new WaitForSeconds(_attack.AttackSpeed);
     }
 
@@ -90,12 +91,15 @@ public class CPlayer : MonoBehaviour, ICollisionObject
 
     public void Hit(float dmg)
     {
-        print("으악");
+
     }
 
     // 추가 성공, 실패 반환
     public bool AddItemToInventory(in ACItem item)
     {
+        if (!item)
+            return false;
+
         int index = -1;
         for (int i = 0; i < (int)INVENTORY.CAPACITY; i++)
         {
@@ -120,7 +124,8 @@ public class CPlayer : MonoBehaviour, ICollisionObject
 
     public void UseItem(int InvenIdx)
     {
-        _inventory[InvenIdx].UseItem(InvenIdx);
+        if (_inventory[InvenIdx])
+            _inventory[InvenIdx].UseItem(InvenIdx);
     }
 
     public void ReleaseEquip(int equipIdx)
@@ -144,8 +149,10 @@ public class CPlayer : MonoBehaviour, ICollisionObject
                 ACItem temp = _equip[equipIdx];
                 _equip[equipIdx] = (CEquipment)_inventory[InvenIdx];
                 _equip[equipIdx].gameObject.transform.SetParent(transform.Find("Equip").transform);
-                _inventory[InvenIdx] = temp;
-                _inventory[InvenIdx].gameObject.transform.SetParent(transform.Find("Inventory").transform);
+                _inventory[InvenIdx] = null;
+                AddItemToInventory(temp);
+                //_inventory[InvenIdx] = temp;
+                //_inventory[InvenIdx].gameObject.transform.SetParent(transform.Find("Inventory").transform);
             }
         }
         else

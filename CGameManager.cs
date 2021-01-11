@@ -42,4 +42,9 @@ public class CGameManager : MonoBehaviour
     {
         return _attackObjectPrototypes[(int)Eindex];
     }
+
+    public void SetTimeScale(float timeScale)
+    {
+        Time.timeScale = timeScale;
+    }
 }

@@ -9,6 +9,13 @@ public class CSlime : MonoBehaviour, ICollisionObject
 
     [SerializeField]
     private float _moveSpeed;
+    [SerializeField]
+    private float _maxHP;
+    private float _hP;
+    [SerializeField]
+    private float _hPBarAddYPos;
+
+    private GameObject _hPBar;
 
     [System.Serializable]
     private struct AttackVars
@@ -17,7 +24,6 @@ public class CSlime : MonoBehaviour, ICollisionObject
         public float DelayAfter;
         public float AttackDistance;
         public float TargetDistance;
-        public bool Attacking;
 
         public WaitForSeconds WaitAfter;
         public WaitForSeconds WaitBefore;
@@ -28,6 +34,8 @@ public class CSlime : MonoBehaviour, ICollisionObject
         public Vector2 AttackPos;
         [HideInInspector]
         public float AttackAngle;
+        [HideInInspector]
+        public bool Attacking;
     }
 
     [SerializeField]
@@ -43,6 +51,7 @@ public class CSlime : MonoBehaviour, ICollisionObject
         _attack.WaitAfter = new WaitForSeconds(_attack.DelayAfter);
         _attack.WaitBefore = new WaitForSeconds(_attack.DelayBefore);
 
+        _hP = _maxHP;
         // 이거안해주면 CoroutineAttack 시작할때 한번 때리고 시작함
         _moveDir = _player.transform.position - transform.position;
         StartCoroutine("CoroutineAttack");
@@ -58,7 +67,44 @@ public class CSlime : MonoBehaviour, ICollisionObject
 
     public void Hit(float dmg)
     {
-        print(gameObject.name + " : " + dmg + "데미지 입음");
+        _hP -= dmg;
+
+        if (_hP < 0)
+        {
+            Die();
+            return;
+        }
+
+        if(!_hPBar)
+        {
+            if (CUIManager._instance.HPBarPoolIsEmpty())
+                _hPBar = Instantiate(CUIManager._instance.HPBarPrefab, GameObject.Find("HPBarObjectPool").transform);
+            else
+            {
+                _hPBar = CUIManager._instance.PopHPBarByPool();
+                _hPBar.SetActive(true);
+            }
+            _hPBar.GetComponent<CHPBar>().Owner = gameObject;
+            _hPBar.GetComponent<CHPBar>().AddYValue = _hPBarAddYPos;
+        }
+        _hPBar.GetComponent<CHPBar>().SetFillAmount(_hP / _maxHP);
+    }
+
+    void Die()
+    {
+        if(GetComponentInChildren<CAttack>())
+        {
+            GameObject attack = GetComponentInChildren<CAttack>().gameObject;
+            attack.transform.SetParent(CGameManager._instance.transform.Find("AttackObjectPool").transform);
+            CGameManager._instance.AddAttackObjectInPool(attack);
+            attack.SetActive(false);
+        }
+
+        CUIManager._instance.AddHPBarInPool(_hPBar);
+        _hPBar.SetActive(false);
+        _hPBar = null;
+
+        Destroy(gameObject);
     }
 
     void Move()

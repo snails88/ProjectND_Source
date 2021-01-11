@@ -46,7 +46,8 @@ public class CInputManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            _player.Attack();
+            if (Time.timeScale != 0f)
+                _player.Attack();
         }
     }
 

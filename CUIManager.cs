@@ -12,7 +12,13 @@ public class CUIManager : MonoBehaviour
     private Image[] _inventoryImages = new Image[(int)INVENTORY.CAPACITY];
     private Image[] _equipImages = new Image[(int)EQUIP_SLOT.EQUIP_SLOT_END];
     private CPlayer _player;
-
+    private Queue<GameObject> _hPBarPool = new Queue<GameObject>();
+    [SerializeField]
+    private GameObject _hPBarPrefab;
+    public GameObject HPBarPrefab
+    {
+        get { return _hPBarPrefab; }
+    }
 
     private void Awake()
     {
@@ -36,9 +42,34 @@ public class CUIManager : MonoBehaviour
         _player = GameObject.Find("Player").GetComponent<CPlayer>();
     }
 
+    public bool HPBarPoolIsEmpty()
+    {
+        return _hPBarPool.Count == 0 ? true : false;
+    }
+
+    public void AddHPBarInPool(in GameObject go)
+    {
+        _hPBarPool.Enqueue(go);
+    }
+
+    public GameObject PopHPBarByPool()
+    {
+        return _hPBarPool.Dequeue();
+    }
+
     public void PopUpInventory()
     {
-        _UIInventory.SetActive(!_UIInventory.activeSelf);
+        if(_UIInventory.activeSelf)
+        {
+            _UIInventory.SetActive(false);
+            CGameManager._instance.SetTimeScale(1f);
+        }
+        else
+        {
+            _UIInventory.SetActive(true);
+            CGameManager._instance.SetTimeScale(0f);
+        }
+        // _UIInventory.SetActive(!_UIInventory.activeSelf);
     }
 
     public void RefreshInventory()
