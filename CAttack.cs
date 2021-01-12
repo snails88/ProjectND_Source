@@ -14,10 +14,21 @@ public class CAttack : MonoBehaviour
 
     private List<GameObject> _hitList = new List<GameObject>();
 
+    private GameObject _objectPoolObject;
+    private GameObject _graphicObject;
+    private GameObject _prototypePrefab;
+    private Transform _prototypeGraphicTransform;
+
     public float Damage
     {
         get;
         set;
+    }
+
+    private void Awake()
+    {
+        _objectPoolObject = GameObject.Find("AttackObjectPool");
+        _graphicObject = transform.Find("Graphic").gameObject;
     }
 
     private void OnEnable()
@@ -34,21 +45,22 @@ public class CAttack : MonoBehaviour
         if(_lifeTime <= _currentTime)
         {
             CGameManager._instance.AddAttackObjectInPool(gameObject);
-            gameObject.transform.SetParent(GameObject.Find("AttackObjectPool").transform);
+            gameObject.transform.SetParent(_objectPoolObject.transform);
             gameObject.SetActive(false);
         }
     }
 
     public void SetAttack(PROTOTYPE_ATTACK prototype, float dmg)
     {
-        GameObject prototypePrefab = CGameManager._instance.GetAttackObjectPrototype((int)prototype);
-        gameObject.layer = prototypePrefab.layer;
-        transform.Find("Graphic").transform.localScale = prototypePrefab.transform.Find("Graphic").transform.localScale;
-        transform.Find("Graphic").GetComponent<SpriteRenderer>().color = prototypePrefab.transform.Find("Graphic").GetComponent<SpriteRenderer>().color;
-        GetComponentInChildren<BoxCollider2D>().size = prototypePrefab.GetComponent<BoxCollider2D>().size;
-        GetComponentInChildren<BoxCollider2D>().offset = prototypePrefab.GetComponent<BoxCollider2D>().offset;
-        _lifeTime = prototypePrefab.GetComponent<CAttack>()._lifeTime;
-        _ownerTag = prototypePrefab.GetComponent<CAttack>()._ownerTag;
+        _prototypePrefab = CGameManager._instance.GetAttackObjectPrototype((int)prototype);
+        _prototypeGraphicTransform = _prototypePrefab.transform.Find("Graphic");
+        gameObject.layer = _prototypePrefab.layer;
+        _graphicObject.transform.localScale = _prototypeGraphicTransform.localScale;
+        _graphicObject.GetComponent<SpriteRenderer>().color = _prototypeGraphicTransform.GetComponent<SpriteRenderer>().color;
+        GetComponentInChildren<BoxCollider2D>().size = _prototypePrefab.GetComponent<BoxCollider2D>().size;
+        GetComponentInChildren<BoxCollider2D>().offset = _prototypePrefab.GetComponent<BoxCollider2D>().offset;
+        _lifeTime = _prototypePrefab.GetComponent<CAttack>()._lifeTime;
+        _ownerTag = _prototypePrefab.GetComponent<CAttack>()._ownerTag;
         
         Damage = dmg;
     }
@@ -56,7 +68,7 @@ public class CAttack : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag != _ownerTag)
+        if (!collision.CompareTag(_ownerTag))
         {
             foreach (GameObject hitObject in _hitList)
             {

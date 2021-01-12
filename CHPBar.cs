@@ -12,8 +12,7 @@ public class CHPBar : MonoBehaviour
         set { _addYValue = value; }
     }
     private Image _image;
-    
-    
+        
     //RectTransform _rt;
     public GameObject Owner
     {
@@ -23,7 +22,6 @@ public class CHPBar : MonoBehaviour
 
     private void Awake()
     {
-        //_rt = GetComponent<RectTransform>();
         _image = transform.Find("ProgressBar").GetComponent<Image>();
     }
 
