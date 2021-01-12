@@ -8,6 +8,8 @@ public class CInputManager : MonoBehaviour
 
     private CPlayer _player;
     private Vector2 _moveDir;
+    private string _horizon = "Horizontal";
+    private string _vertical = "Vertical";
 
     private LinkedList<GameObject> _interactionList = new LinkedList<GameObject>();
 
@@ -26,14 +28,15 @@ public class CInputManager : MonoBehaviour
     {
         PlayerMove();
         PlayerAttack();
+        PlayerEvasion();
         PopUpInventory();
         Interaction();
     }
 
     void PlayerMove()
     {
-        _moveDir.x = Input.GetAxisRaw("Horizontal");
-        _moveDir.y = Input.GetAxisRaw("Vertical");
+        _moveDir.x = Input.GetAxisRaw(_horizon);
+        _moveDir.y = Input.GetAxisRaw(_vertical);
 
         if(_moveDir.magnitude != 0f)
         {
@@ -48,6 +51,14 @@ public class CInputManager : MonoBehaviour
         {
             if (Time.timeScale != 0f)
                 _player.Attack();
+        }
+    }
+
+    void PlayerEvasion()
+    {
+        if(Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            _player.Evasion(_moveDir);
         }
     }
 
