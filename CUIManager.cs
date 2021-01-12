@@ -10,7 +10,9 @@ public class CUIManager : MonoBehaviour
 
     private GameObject _UIInventory;
     private Image[] _inventoryImages = new Image[(int)INVENTORY.CAPACITY];
+    private Text[] _inventoryTexts = new Text[(int)INVENTORY.CAPACITY];
     private Image[] _equipImages = new Image[(int)EQUIP_SLOT.EQUIP_SLOT_END];
+    private Text[] _equipTexts = new Text[(int)EQUIP_SLOT.EQUIP_SLOT_END];
     private CPlayer _player;
     private Queue<GameObject> _hPBarPool = new Queue<GameObject>();
     [SerializeField]
@@ -29,10 +31,12 @@ public class CUIManager : MonoBehaviour
         for (int i = 0; i < (int)INVENTORY.CAPACITY; i++)
         {
             _inventoryImages[i] = GameObject.Find("InventoryImage_" + i.ToString()).GetComponent<Image>();
+            _inventoryTexts[i] = GameObject.Find("InventoryText_" + i.ToString()).GetComponent<Text>();
         }
         for (int i = 0; i < (int)EQUIP_SLOT.EQUIP_SLOT_END; i++)
         {
             _equipImages[i] = GameObject.Find("EquipImage_" + i.ToString()).GetComponent<Image>();
+            _equipTexts[i] = GameObject.Find("EquipText_" + i.ToString()).GetComponent<Text>();
         }
         _UIInventory.SetActive(false);
     }
@@ -77,17 +81,29 @@ public class CUIManager : MonoBehaviour
         for (int i = 0; i < (int)INVENTORY.CAPACITY; i++)
         {
             if (_player.Inventory[i])
+            {
                 _inventoryImages[i].sprite = _player.Inventory[i].gameObject.transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
+                _inventoryTexts[i].text = _player.Inventory[i].InventoryExpress.ToString();
+            }
             else
+            {
                 _inventoryImages[i].sprite = null;
+                _inventoryTexts[i].text = string.Empty;
+            }
         }
 
         for (int i = 0; i < (int)EQUIP_SLOT.EQUIP_SLOT_END; i++)
         {
-            if(_player.Equip[i])
+            if (_player.Equip[i])
+            {
                 _equipImages[i].sprite = _player.Equip[i].gameObject.transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
+                _equipTexts[i].text = _player.Equip[i].Lv.ToString();
+            }
             else
+            {
                 _equipImages[i].sprite = null;
+                _equipTexts[i].text = string.Empty;
+            }
         }
     }
 
