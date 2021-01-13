@@ -33,5 +33,6 @@ public class CEquipment : ACItem
     public override void UseItem(int InvenIdx)
     {
         _player.EquipItem(InvenIdx);
+        CUIManager._instance.RefreshInventory();
     }
 }

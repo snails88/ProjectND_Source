@@ -53,16 +53,22 @@ public class CPlayer : MonoBehaviour, ICollisionObject
     private Transform _graphicTransform;
     
 
-    private CEquipment[] _equip = new CEquipment[(int)EQUIP_SLOT.EQUIP_SLOT_END];
-    public CEquipment[] Equip
+    private CEquipment[] _equips = new CEquipment[(int)EQUIP_SLOT.EQUIP_SLOT_END];
+    public CEquipment[] Equips
     {
-        get { return _equip; }
+        get { return _equips; }
     }
 
     private ACItem[] _inventory = new ACItem[(int)INVENTORY.CAPACITY];
     public ACItem[] Inventory
     {
         get { return _inventory; }
+    }
+
+    private ACItem[] _quickSlots = new ACItem[(int)QUICK_SLOT.CAPACITY];
+    public ACItem[] QuickSlots
+    {
+        get { return _quickSlots; }
     }
 
     private void Awake()
@@ -102,8 +108,8 @@ public class CPlayer : MonoBehaviour, ICollisionObject
             GameObject attack;
             if (CGameManager._instance.AttackObjectPoolIsEmpty())
             {
-                if (_equip[(int)EQUIP_SLOT.WEAPON])
-                    attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype((int)((CWeapon)_equip[(int)EQUIP_SLOT.WEAPON]).AttackType), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward));
+                if (_equips[(int)EQUIP_SLOT.WEAPON])
+                    attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype((int)((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).AttackType), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward));
                 else
                     attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype(PROTOTYPE_ATTACK.BASIC), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward));
                 attack.GetComponent<CAttack>().Damage = 1f;
@@ -112,8 +118,8 @@ public class CPlayer : MonoBehaviour, ICollisionObject
             {
                 attack = CGameManager._instance.PopAttackObjectByPool();
                 attack.SetActive(true);
-                if (_equip[(int)EQUIP_SLOT.WEAPON])
-                    attack.GetComponent<CAttack>().SetAttack(((CWeapon)_equip[(int)EQUIP_SLOT.WEAPON]).AttackType, 1f);
+                if (_equips[(int)EQUIP_SLOT.WEAPON])
+                    attack.GetComponent<CAttack>().SetAttack(((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).AttackType, 1f);
                 else
                     attack.GetComponent<CAttack>().SetAttack(PROTOTYPE_ATTACK.BASIC, 1f);
                 attack.transform.rotation = Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward);
@@ -223,9 +229,9 @@ public class CPlayer : MonoBehaviour, ICollisionObject
 
     public void ReleaseEquip(int equipIdx)
     {
-        if(AddItemToInventory(_equip[equipIdx]))
+        if(AddItemToInventory(_equips[equipIdx]))
         {
-            _equip[equipIdx] = null;
+            _equips[equipIdx] = null;
             CUIManager._instance.RefreshInventory();
             if (equipIdx == (int)EQUIP_SLOT.WEAPON)
                 _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed);
@@ -235,28 +241,127 @@ public class CPlayer : MonoBehaviour, ICollisionObject
     public void EquipItem(int InvenIdx)
     {
         int equipIdx = (int)((CEquipment)_inventory[InvenIdx]).EquipSlot;
-        if (_equip[equipIdx])
+        if (_equips[equipIdx])
         {
             if (_inventory[InvenIdx] is CEquipment)
             {
-                ACItem temp = _equip[equipIdx];
-                _equip[equipIdx] = (CEquipment)_inventory[InvenIdx];
-                _equip[equipIdx].gameObject.transform.SetParent(_equipTransform);
+                ACItem temp = _equips[equipIdx];
+                _equips[equipIdx] = (CEquipment)_inventory[InvenIdx];
+                _equips[equipIdx].gameObject.transform.SetParent(_equipTransform);
                 _inventory[InvenIdx] = null;
                 AddItemToInventory(temp);
             }
         }
         else
         {
-            _equip[equipIdx] = (CEquipment)_inventory[InvenIdx];
-            _equip[equipIdx].gameObject.transform.SetParent(_equipTransform);
+            _equips[equipIdx] = (CEquipment)_inventory[InvenIdx];
+            _equips[equipIdx].gameObject.transform.SetParent(_equipTransform);
             _inventory[InvenIdx] = null;
         }
 
         // 무기바꾸면 무기공격속도 적용
         if (equipIdx == (int)EQUIP_SLOT.WEAPON)
-            _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)_equip[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
-        CUIManager._instance.RefreshInventory();
+            _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
+    }
+
+    public bool DragItemSlot(int startIdx, int destIdx)
+    {
+        if (destIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
+        {
+            // 목표아이템이 장비슬롯에있으면
+            if (_equips[destIdx])
+            {
+                // 바꿀 시작 아이템이 장비슬롯에있으면 리턴 (의미없으니)
+                if (startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
+                    return false;
+
+                // 시작 아이템이 인벤토리에있으면
+                else if(startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
+                {
+                    startIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END;
+                    if (_inventory[startIdx] is CEquipment)
+                    {
+                        if ((int)((CEquipment)_inventory[startIdx]).EquipSlot == destIdx)
+                        {
+                            // fix) 이거 무조건 첫번째 빈칸으로 빼는데 나중에 바꾸기
+                            EquipItem(startIdx);
+                            return true;
+                        }
+                        else
+                            return false;
+                    }
+                    else
+                        return false;
+                }
+            }
+            else
+            {
+                if (startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
+                {
+                    startIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END;
+                    if (_inventory[startIdx] is CEquipment && (int)((CEquipment)_inventory[startIdx]).EquipSlot == destIdx)
+                    {
+                        EquipItem(startIdx);
+                        return true;
+                    }
+                }
+                else
+                    return false;
+            }
+        }
+        // 목표아이템이 인벤토리슬롯에 있으면
+        else if (destIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
+        {
+            destIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END;
+
+            // 시작 아이템이 장비슬롯에있으면
+            if (startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
+            {
+                if(!_inventory[destIdx])
+                {
+                    // fix) 이거 무조건 첫번째 빈칸으로 빼는데 나중에 바꾸기
+                    ReleaseEquip((int)_equips[startIdx].EquipSlot);
+                    return true;
+                }
+                else if (_inventory[destIdx] is CEquipment)
+                {
+                    if (_equips[startIdx].EquipSlot == ((CEquipment)_inventory[destIdx]).EquipSlot)
+                    {
+                        EquipItem(destIdx);
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+                else
+                    return false;
+            }
+            // 시작 아이템이 인벤토리에있으면
+            else if(startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
+            {
+                startIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END;
+
+                if(_inventory[destIdx])
+                {
+                    ACItem temp = _inventory[destIdx];
+                    _inventory[destIdx] = _inventory[startIdx];
+                    _inventory[startIdx] = temp;
+                }
+                else
+                {
+                    _inventory[destIdx] = _inventory[startIdx];
+                    _inventory[startIdx] = null;
+                }
+                return true;
+            }
+        }
+        // 목표아이템이 퀵슬롯에 있으면
+        else
+        {
+            
+        }
+
+        return false;
     }
 
     public void Evasion(in Vector3 dir)

@@ -8,6 +8,7 @@ public class CUIManager : MonoBehaviour
 {
     public static CUIManager _instance;
 
+    private int _mouseOverIdx = -1;
     private GameObject _UIInventory;
     private Image[] _inventoryImages = new Image[(int)INVENTORY.CAPACITY];
     private Text[] _inventoryTexts = new Text[(int)INVENTORY.CAPACITY];
@@ -20,6 +21,10 @@ public class CUIManager : MonoBehaviour
     public GameObject HPBarPrefab
     {
         get { return _hPBarPrefab; }
+    }
+    public int MouseOverIndex
+    {
+        get { return _mouseOverIdx; }
     }
 
     private void Awake()
@@ -94,10 +99,10 @@ public class CUIManager : MonoBehaviour
 
         for (int i = 0; i < (int)EQUIP_SLOT.EQUIP_SLOT_END; i++)
         {
-            if (_player.Equip[i])
+            if (_player.Equips[i])
             {
-                _equipImages[i].sprite = _player.Equip[i].gameObject.transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
-                _equipTexts[i].text = _player.Equip[i].Lv.ToString();
+                _equipImages[i].sprite = _player.Equips[i].gameObject.transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
+                _equipTexts[i].text = _player.Equips[i].Lv.ToString();
             }
             else
             {
@@ -112,8 +117,36 @@ public class CUIManager : MonoBehaviour
         _player.UseItem(invenIdx);
     }
 
+    public void UseQuickSlotItem(int quickSlotIdx)
+    {
+
+    }
+
     public void ReleaseEquip(int equipIdx)
     {
         _player.ReleaseEquip(equipIdx);
+    }
+
+    public void OnMouseOverEquip(int index)
+    {
+        _mouseOverIdx = index;
+        print(_mouseOverIdx);
+    }
+
+    public void OnMouseOverInventory(int index)
+    {
+        _mouseOverIdx = index + (int)EQUIP_SLOT.EQUIP_SLOT_END;
+        print(_mouseOverIdx);
+    }
+
+    public void OnMouseOverQuickSlot(int index)
+    {
+        _mouseOverIdx = index + (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY;
+        print(_mouseOverIdx);
+    }
+
+    public void ExitMouse()
+    {
+        _mouseOverIdx = -1;
     }
 }
