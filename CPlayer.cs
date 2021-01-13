@@ -247,7 +247,7 @@ public class CPlayer : MonoBehaviour, ICollisionObject
             {
                 ACItem temp = _equips[equipIdx];
                 _equips[equipIdx] = (CEquipment)_inventory[InvenIdx];
-                _equips[equipIdx].gameObject.transform.SetParent(_equipTransform);
+                _equips[equipIdx].transform.SetParent(_equipTransform);
                 _inventory[InvenIdx] = null;
                 AddItemToInventory(temp);
             }
@@ -255,7 +255,7 @@ public class CPlayer : MonoBehaviour, ICollisionObject
         else
         {
             _equips[equipIdx] = (CEquipment)_inventory[InvenIdx];
-            _equips[equipIdx].gameObject.transform.SetParent(_equipTransform);
+            _equips[equipIdx].transform.SetParent(_equipTransform);
             _inventory[InvenIdx] = null;
         }
 
@@ -283,8 +283,13 @@ public class CPlayer : MonoBehaviour, ICollisionObject
                     {
                         if ((int)((CEquipment)_inventory[startIdx]).EquipSlot == destIdx)
                         {
-                            // fix) 이거 무조건 첫번째 빈칸으로 빼는데 나중에 바꾸기
-                            EquipItem(startIdx);
+                            ACItem temp = _equips[destIdx];
+                            _equips[destIdx] = (CEquipment)_inventory[startIdx];
+                            _equips[destIdx].transform.SetParent(_equipTransform);
+                            _inventory[startIdx] = temp;
+                            _inventory[startIdx].transform.SetParent(_invenTransform);
+                            if (_equips[destIdx].EquipSlot == EQUIP_SLOT.WEAPON)
+                                _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
                             return true;
                         }
                         else
@@ -301,6 +306,7 @@ public class CPlayer : MonoBehaviour, ICollisionObject
                     startIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END;
                     if (_inventory[startIdx] is CEquipment && (int)((CEquipment)_inventory[startIdx]).EquipSlot == destIdx)
                     {
+                        // EquipItem 들어가서 검사 중복으로 하는 문제있음
                         EquipItem(startIdx);
                         return true;
                     }
@@ -319,15 +325,24 @@ public class CPlayer : MonoBehaviour, ICollisionObject
             {
                 if(!_inventory[destIdx])
                 {
-                    // fix) 이거 무조건 첫번째 빈칸으로 빼는데 나중에 바꾸기
-                    ReleaseEquip((int)_equips[startIdx].EquipSlot);
+                    _inventory[destIdx] = _equips[startIdx];
+                    _equips[startIdx] = null;
+                    _inventory[destIdx].transform.SetParent(_invenTransform);
+                    if (startIdx == (int)EQUIP_SLOT.WEAPON)
+                        _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed);
                     return true;
                 }
                 else if (_inventory[destIdx] is CEquipment)
                 {
                     if (_equips[startIdx].EquipSlot == ((CEquipment)_inventory[destIdx]).EquipSlot)
                     {
-                        EquipItem(destIdx);
+                        ACItem temp = _equips[startIdx];
+                        _equips[startIdx] = (CEquipment)_inventory[destIdx];
+                        _equips[startIdx].transform.SetParent(_equipTransform);
+                        _inventory[destIdx] = temp;
+                        _inventory[destIdx].transform.SetParent(_invenTransform);
+                        if (_equips[startIdx].EquipSlot == EQUIP_SLOT.WEAPON)
+                            _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
                         return true;
                     }
                     else
