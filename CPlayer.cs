@@ -264,6 +264,28 @@ public class CPlayer : MonoBehaviour, ICollisionObject
             _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
     }
 
+    private bool SwapEquipToInventory(int equipIdx, int invenIdx)
+    {
+        if (_inventory[invenIdx] is CEquipment)
+        {
+            if ((int)((CEquipment)_inventory[invenIdx]).EquipSlot == equipIdx)
+            {
+                ACItem temp = _equips[equipIdx];
+                _equips[equipIdx] = (CEquipment)_inventory[invenIdx];
+                _equips[equipIdx].transform.SetParent(_equipTransform);
+                _inventory[invenIdx] = temp;
+                _inventory[invenIdx].transform.SetParent(_invenTransform);
+                if (_equips[equipIdx].EquipSlot == EQUIP_SLOT.WEAPON)
+                    _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
+                return true;
+            }
+            else
+                return false;
+        }
+        else
+            return false;
+    }
+
     public bool DragItemSlot(int startIdx, int destIdx)
     {
         if (destIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
@@ -279,24 +301,7 @@ public class CPlayer : MonoBehaviour, ICollisionObject
                 else if(startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
                 {
                     startIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END;
-                    if (_inventory[startIdx] is CEquipment)
-                    {
-                        if ((int)((CEquipment)_inventory[startIdx]).EquipSlot == destIdx)
-                        {
-                            ACItem temp = _equips[destIdx];
-                            _equips[destIdx] = (CEquipment)_inventory[startIdx];
-                            _equips[destIdx].transform.SetParent(_equipTransform);
-                            _inventory[startIdx] = temp;
-                            _inventory[startIdx].transform.SetParent(_invenTransform);
-                            if (_equips[destIdx].EquipSlot == EQUIP_SLOT.WEAPON)
-                                _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
-                            return true;
-                        }
-                        else
-                            return false;
-                    }
-                    else
-                        return false;
+                    return SwapEquipToInventory(destIdx, startIdx);
                 }
             }
             else
@@ -332,24 +337,8 @@ public class CPlayer : MonoBehaviour, ICollisionObject
                         _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed);
                     return true;
                 }
-                else if (_inventory[destIdx] is CEquipment)
-                {
-                    if (_equips[startIdx].EquipSlot == ((CEquipment)_inventory[destIdx]).EquipSlot)
-                    {
-                        ACItem temp = _equips[startIdx];
-                        _equips[startIdx] = (CEquipment)_inventory[destIdx];
-                        _equips[startIdx].transform.SetParent(_equipTransform);
-                        _inventory[destIdx] = temp;
-                        _inventory[destIdx].transform.SetParent(_invenTransform);
-                        if (_equips[startIdx].EquipSlot == EQUIP_SLOT.WEAPON)
-                            _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
-                        return true;
-                    }
-                    else
-                        return false;
-                }
                 else
-                    return false;
+                    return SwapEquipToInventory(startIdx, destIdx);
             }
             // 시작 아이템이 인벤토리에있으면
             else if(startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
