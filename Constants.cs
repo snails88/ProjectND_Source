@@ -6,7 +6,7 @@
 
     public enum EQUIP_SLOT { WEAPON, ARMOR, EQUIP_SLOT_END };
 
-    public enum QUICK_SLOT { CAPACITY = 5 };
+    public enum QUICK_SLOT { CAPACITY = 4 };
 
     public enum POTION { HEALING, POTION_END };
 }

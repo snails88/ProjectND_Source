@@ -14,6 +14,8 @@ public class CUIManager : MonoBehaviour
     private Text[] _inventoryTexts = new Text[(int)INVENTORY.CAPACITY];
     private Image[] _equipImages = new Image[(int)EQUIP_SLOT.EQUIP_SLOT_END];
     private Text[] _equipTexts = new Text[(int)EQUIP_SLOT.EQUIP_SLOT_END];
+    private Image[] _quickSlotImages = new Image[(int)QUICK_SLOT.CAPACITY];
+    private Text[] _quickSlotTexts = new Text[(int)QUICK_SLOT.CAPACITY];
     private CPlayer _player;
     private Queue<GameObject> _hPBarPool = new Queue<GameObject>();
     [SerializeField]
@@ -42,6 +44,12 @@ public class CUIManager : MonoBehaviour
         {
             _equipImages[i] = GameObject.Find("EquipImage_" + i.ToString()).GetComponent<Image>();
             _equipTexts[i] = GameObject.Find("EquipText_" + i.ToString()).GetComponent<Text>();
+        }
+        for (int i = 0; i < (int)QUICK_SLOT.CAPACITY; i++)
+        {
+            _quickSlotImages[i] = GameObject.Find("QuickSlotImage_" + i.ToString()).GetComponent<Image>();
+            _quickSlotTexts[i] = GameObject.Find("QuickSlotText_" + i.ToString()).GetComponent<Text>();
+
         }
         _UIInventory.SetActive(false);
     }
@@ -110,6 +118,20 @@ public class CUIManager : MonoBehaviour
                 _equipTexts[i].text = string.Empty;
             }
         }
+
+        for (int i = 0; i < (int)QUICK_SLOT.CAPACITY; i++)
+        {
+            if (_player.QuickSlots[i])
+            {
+                _quickSlotImages[i].sprite = _player.QuickSlots[i].gameObject.transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
+                _quickSlotTexts[i].text = _player.QuickSlots[i].InventoryExpress.ToString();
+            }
+            else
+            {
+                _quickSlotImages[i].sprite = null;
+                _quickSlotTexts[i].text = string.Empty;
+            }
+        }
     }
 
     public void UseItem(int invenIdx)
@@ -119,7 +141,7 @@ public class CUIManager : MonoBehaviour
 
     public void UseQuickSlotItem(int quickSlotIdx)
     {
-
+        _player.UseQuickSlotItem(quickSlotIdx);
     }
 
     public void ReleaseEquip(int equipIdx)

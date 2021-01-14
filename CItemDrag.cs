@@ -13,8 +13,8 @@ public class CItemDrag : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDra
     [SerializeField]
     private Image _image;
     private CPlayer _player;
-    private int _startIndex;
 
+    private static int _startIndex;
     private static bool _drag = false;
 
     private void Awake()
@@ -79,7 +79,11 @@ public class CItemDrag : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDra
                 if (_player.DragItemSlot(_startIndex, CUIManager._instance.MouseOverIndex))
                     CUIManager._instance.RefreshInventory();
             }
-            
+            else if (CUIManager._instance.MouseOverIndex == -1 && _startIndex > (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
+            {
+                _player.RemoveItemFromQuickSlot(_startIndex - (int)EQUIP_SLOT.EQUIP_SLOT_END - (int)INVENTORY.CAPACITY);
+                CUIManager._instance.RefreshInventory();
+            }
             _drag = false;
             _image.raycastTarget = true;
             transform.position = _initPos;

@@ -205,6 +205,30 @@ public class CPlayer : MonoBehaviour, ICollisionObject
             _inventory[InvenIdx].UseItem(InvenIdx);
     }
 
+    public void UseQuickSlotItem(int quickSlotIdx)
+    {
+        if (_quickSlots[quickSlotIdx])
+        {
+            int index = -1;
+
+            for (int i = 0; i < (int)INVENTORY.CAPACITY; i++)
+            {
+                if (_quickSlots[quickSlotIdx] == _inventory[i])
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if (index != -1)
+            {
+                _quickSlots[quickSlotIdx].UseItem(index);
+                if (!_quickSlots[quickSlotIdx] || _quickSlots[quickSlotIdx].InventoryExpress == 0)
+                    _quickSlots[quickSlotIdx] = null;
+                CUIManager._instance.RefreshInventory();
+            }
+        }
+    }
+
     public void UsePotion(int InvenIdx)
     {
         switch (((CPotion)_inventory[InvenIdx]).Sort)
@@ -238,25 +262,25 @@ public class CPlayer : MonoBehaviour, ICollisionObject
         }
     }
 
-    public void EquipItem(int InvenIdx)
+    public void EquipItem(int invenIdx)
     {
-        int equipIdx = (int)((CEquipment)_inventory[InvenIdx]).EquipSlot;
+        int equipIdx = (int)((CEquipment)_inventory[invenIdx]).EquipSlot;
         if (_equips[equipIdx])
         {
-            if (_inventory[InvenIdx] is CEquipment)
+            if (_inventory[invenIdx] is CEquipment)
             {
                 ACItem temp = _equips[equipIdx];
-                _equips[equipIdx] = (CEquipment)_inventory[InvenIdx];
+                _equips[equipIdx] = (CEquipment)_inventory[invenIdx];
                 _equips[equipIdx].transform.SetParent(_equipTransform);
-                _inventory[InvenIdx] = null;
+                _inventory[invenIdx] = null;
                 AddItemToInventory(temp);
             }
         }
         else
         {
-            _equips[equipIdx] = (CEquipment)_inventory[InvenIdx];
+            _equips[equipIdx] = (CEquipment)_inventory[invenIdx];
             _equips[equipIdx].transform.SetParent(_equipTransform);
-            _inventory[InvenIdx] = null;
+            _inventory[invenIdx] = null;
         }
 
         // 무기바꾸면 무기공격속도 적용
@@ -286,9 +310,38 @@ public class CPlayer : MonoBehaviour, ICollisionObject
             return false;
     }
 
+    private void RegisterItemToQuickSlot(int startItemIdx, int quickSlotIdx)
+    {
+        if(startItemIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
+            _quickSlots[quickSlotIdx] = _equips[startItemIdx];
+
+        // 퀵슬롯에서 퀵슬롯 스왑은 DragItemSlot에서 처리함.
+        else
+            _quickSlots[quickSlotIdx] = _inventory[startItemIdx - (int)EQUIP_SLOT.EQUIP_SLOT_END];
+    }
+
+    public void RemoveItemFromQuickSlot(int quickSlotIdx)
+    {
+        _quickSlots[quickSlotIdx] = null;
+    }
+
     public bool DragItemSlot(int startIdx, int destIdx)
     {
-        if (destIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
+        if(startIdx >= (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
+        {
+            startIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY;
+            if (destIdx >= (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
+            {
+                destIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY;
+                ACItem temp = _quickSlots[destIdx];
+                _quickSlots[destIdx] = _quickSlots[startIdx];
+                _quickSlots[startIdx] = temp;
+                return true;
+            }
+            // 버튼말고 밖으로 빼는 경우는 CItemDrag.OnEndDrag에서 바로 처리.
+            return false;
+        }
+        else if (destIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
         {
             // 목표아이템이 장비슬롯에있으면
             if (_equips[destIdx])
@@ -362,7 +415,8 @@ public class CPlayer : MonoBehaviour, ICollisionObject
         // 목표아이템이 퀵슬롯에 있으면
         else
         {
-            
+            RegisterItemToQuickSlot(startIdx, destIdx - (int)EQUIP_SLOT.EQUIP_SLOT_END - (int)INVENTORY.CAPACITY);
+            return true;
         }
 
         return false;
