@@ -120,20 +120,21 @@ public class CSlime : MonoBehaviour, ICollisionObject
             {
                 _attack.AttackPos = _attack.AttackDir * _attack.AttackDistance + transform.position;
 
-                GameObject attack;
+                CAttack attack;
                 if (CGameManager._instance.AttackObjectPoolIsEmpty())
                 {
-                    attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype(PROTOTYPE_ATTACK.SLIME), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward));
-                    attack.GetComponent<CAttack>().Damage = 1f;
+                    attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype(PROTOTYPE_ATTACK.SLIME), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward)).GetComponent<CAttack>();
+                    attack.Damage = 1f;
                 }
                 else
                 {
-                    attack = CGameManager._instance.PopAttackObjectByPool();
-                    attack.SetActive(true);
-                    attack.GetComponent<CAttack>().SetAttack(PROTOTYPE_ATTACK.SLIME, 1f);
+                    attack = CGameManager._instance.PopAttackObjectByPool().GetComponent<CAttack>();
+                    attack.gameObject.SetActive(true);
+                    attack.SetAttack(PROTOTYPE_ATTACK.SLIME, 1f);
                     attack.transform.rotation = Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward);
                     attack.transform.position = _attack.AttackPos;
                 }
+                attack.LifeTimeCoroutineStart();
                 attack.transform.SetParent(gameObject.transform);
                 yield return new WaitForSeconds(_attack.DelayAfter);
                 _attack.Attacking = false;

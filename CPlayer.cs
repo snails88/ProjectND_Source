@@ -105,26 +105,27 @@ public class CPlayer : MonoBehaviour, ICollisionObject
 
             _attack.AttackPos = (_mousePos - transform.position).normalized * _attack.AttackDistance + transform.position;
             _attack.AttackAngle = Mathf.Atan2(_mousePos.y - transform.position.y, _mousePos.x - transform.position.x) * Mathf.Rad2Deg;
-            GameObject attack;
+            CAttack attack;
             if (CGameManager._instance.AttackObjectPoolIsEmpty())
             {
                 if (_equips[(int)EQUIP_SLOT.WEAPON])
-                    attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype((int)((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).AttackType), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward));
+                    attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype((int)((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).AttackType), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward)).GetComponent<CAttack>();
                 else
-                    attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype(PROTOTYPE_ATTACK.BASIC), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward));
-                attack.GetComponent<CAttack>().Damage = 1f;
+                    attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype(PROTOTYPE_ATTACK.BASIC), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward)).GetComponent<CAttack>();
+                attack.Damage = 1f;
             }
             else
             {
-                attack = CGameManager._instance.PopAttackObjectByPool();
-                attack.SetActive(true);
+                attack = CGameManager._instance.PopAttackObjectByPool().GetComponent<CAttack>();
+                attack.gameObject.SetActive(true);
                 if (_equips[(int)EQUIP_SLOT.WEAPON])
-                    attack.GetComponent<CAttack>().SetAttack(((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).AttackType, 1f);
+                    attack.SetAttack(((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).AttackType, 1f);
                 else
-                    attack.GetComponent<CAttack>().SetAttack(PROTOTYPE_ATTACK.BASIC, 1f);
+                    attack.SetAttack(PROTOTYPE_ATTACK.BASIC, 1f);
                 attack.transform.rotation = Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward);
                 attack.transform.position = _attack.AttackPos;
             }
+            attack.LifeTimeCoroutineStart();
             attack.transform.SetParent(gameObject.transform);
             _attack.Attackable = false;
         }

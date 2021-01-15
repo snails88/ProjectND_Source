@@ -7,7 +7,6 @@ public class CAttack : MonoBehaviour
 {
     [SerializeField]
     private float _lifeTime;
-    private float _currentTime;
 
     [SerializeField]
     private string _ownerTag;
@@ -19,6 +18,8 @@ public class CAttack : MonoBehaviour
     private GameObject _prototypePrefab;
     private Transform _prototypeGraphicTransform;
 
+    WaitForSeconds _wait;
+
     public float Damage
     {
         get;
@@ -29,25 +30,22 @@ public class CAttack : MonoBehaviour
     {
         _objectPoolObject = GameObject.Find("AttackObjectPool");
         _graphicObject = transform.Find("Graphic").gameObject;
+        _wait = new WaitForSeconds(_lifeTime);
     }
 
     private void OnEnable()
     {
-        _currentTime = 0f;
         _hitList.Clear();
     }
 
+    public void LifeTimeCoroutineStart()
+    {
+        StartCoroutine("CoroutineLifeTime");
+    }
 
     void Update()
     {
-        _currentTime += Time.deltaTime;
-        
-        if(_lifeTime <= _currentTime)
-        {
-            CGameManager._instance.AddAttackObjectInPool(gameObject);
-            gameObject.transform.SetParent(_objectPoolObject.transform);
-            gameObject.SetActive(false);
-        }
+
     }
 
     public void SetAttack(PROTOTYPE_ATTACK prototype, float dmg)
@@ -60,11 +58,10 @@ public class CAttack : MonoBehaviour
         GetComponentInChildren<BoxCollider2D>().size = _prototypePrefab.GetComponent<BoxCollider2D>().size;
         GetComponentInChildren<BoxCollider2D>().offset = _prototypePrefab.GetComponent<BoxCollider2D>().offset;
         _lifeTime = _prototypePrefab.GetComponent<CAttack>()._lifeTime;
+        _wait = new WaitForSeconds(_lifeTime);
         _ownerTag = _prototypePrefab.GetComponent<CAttack>()._ownerTag;
-        
         Damage = dmg;
     }
-
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -82,5 +79,13 @@ public class CAttack : MonoBehaviour
                 collision.gameObject.GetComponent<ICollisionObject>().Hit(Damage);
             }
         }
+    }
+
+    IEnumerator CoroutineLifeTime()
+    {
+        yield return _wait;
+        CGameManager._instance.AddAttackObjectInPool(gameObject);
+        gameObject.transform.SetParent(_objectPoolObject.transform);
+        gameObject.SetActive(false);
     }
 }
