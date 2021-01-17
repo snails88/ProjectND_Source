@@ -39,7 +39,10 @@ public class CKnight : CPlayer
         while (_evasion.Evasing)
         {
             transform.Translate(_evasion.EvasionDir * _evasion.EvasionSpeed * Time.deltaTime);
-            _graphicTransform.Rotate(Vector3.forward, 360f / _evasion.EvasionTime * Time.deltaTime);
+            if(_spriteRenderer.flipX)
+                _graphicTransform.Rotate(Vector3.forward, 360f / _evasion.EvasionTime * Time.deltaTime);
+            else
+                _graphicTransform.Rotate(Vector3.forward, -360f / _evasion.EvasionTime * Time.deltaTime);
             yield return null;
         }
         _graphicTransform.rotation = Quaternion.Euler(Vector3.zero);
