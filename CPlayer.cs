@@ -51,6 +51,21 @@ public abstract class CPlayer : CCreature
     protected SpriteRenderer _spriteRenderer;
     protected Transform _invenTransform;
     protected Transform _equipTransform;
+    protected float _resource;
+    public float Resource
+    {
+        get { return _resource; }
+    }
+    protected float _maxResource;
+    public float MaxResource
+    {
+        get { return _maxResource; }
+    }
+    protected Color _resourceColor;
+    public Color ResourceColor
+    {
+        get { return _resourceColor; }
+    }
     protected CEquipment[] _equips = new CEquipment[(int)EQUIP_SLOT.EQUIP_SLOT_END];
     public CEquipment[] Equips
     {

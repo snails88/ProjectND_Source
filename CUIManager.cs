@@ -17,6 +17,7 @@ public class CUIManager : MonoBehaviour
     private Image[] _quickSlotImages = new Image[(int)QUICK_SLOT.CAPACITY];
     private Text[] _quickSlotTexts = new Text[(int)QUICK_SLOT.CAPACITY];
     private Image _playerHPProgressBar;
+    private Image _playerResourceProgressBar;
     private CPlayer _player;
     private Queue<GameObject> _hPBarPool = new Queue<GameObject>();
     [SerializeField]
@@ -58,11 +59,14 @@ public class CUIManager : MonoBehaviour
         }
         _UIInventory.SetActive(false);
         _playerHPProgressBar = GameObject.Find("PlayerHPProgressBar").GetComponent<Image>();
+        _playerResourceProgressBar = GameObject.Find("PlayerResourceProgressBar").GetComponent<Image>();
+        _playerResourceProgressBar.color = _player.ResourceColor;
     }
 
     private void Update()
     {
         _playerHPProgressBar.fillAmount = _player.HP / _player.MaxHP;
+        _playerResourceProgressBar.fillAmount = _player.Resource / _player.MaxResource;
     }
 
     public bool HPBarPoolIsEmpty()

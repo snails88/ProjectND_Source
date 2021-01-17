@@ -83,6 +83,11 @@ public class CSlime : CCreature
             _hPBar.GetComponent<CHPBar>().AddYValue = _hPBarAddYPos;
         }
         _hPBar.GetComponent<CHPBar>().SetFillAmount(_hP / _maxHP);
+
+        if(_player is CKnight)
+        {
+            ((CKnight)_player).GainFury(5f);
+        }
     }
 
     protected override void Die()
