@@ -67,6 +67,16 @@ public abstract class CPlayer : CCreature
         get { return _quickSlots; }
     }
 
+    public float HP
+    {
+        get { return _hP; }
+    }
+
+    public float MaxHP
+    {
+        get { return _maxHP; }
+    }
+
     protected virtual void Awake()
     {
         gameObject.name = "Player";
