@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CInputManager : MonoBehaviour
 {
@@ -47,11 +48,8 @@ public class CInputManager : MonoBehaviour
 
     void PlayerAttack()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            if (Time.timeScale != 0f)
-                _player.Attack();
-        }
+        if (Input.GetKeyDown(KeyCode.Mouse0) && Time.timeScale != 0f && !EventSystem.current.IsPointerOverGameObject()) 
+            _player.Attack();
     }
 
     void PlayerEvasion()
