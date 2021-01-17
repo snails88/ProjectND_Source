@@ -265,16 +265,21 @@ public abstract class CPlayer : CCreature
         {
             case POTION.HEALING:
                 {
-                    if(((CPotion)_inventory[InvenIdx]).Count > 0)
+                    if (((CPotion)_inventory[InvenIdx]).Count > 0)
                     {
-                        print("힐링포션 사용! 회복!");
-                        --((CPotion)_inventory[InvenIdx]).Count;
-                        if(((CPotion)_inventory[InvenIdx]).Count == 0)
+                        if (_hP < _maxHP)
                         {
-                            Destroy(_inventory[InvenIdx].gameObject);
-                            _inventory[InvenIdx] = null;
+                            _hP += _maxHP * 0.5f;
+                            if (_hP > _maxHP)
+                                _hP = _maxHP;
+                            --((CPotion)_inventory[InvenIdx]).Count;
+                            if (((CPotion)_inventory[InvenIdx]).Count == 0)
+                            {
+                                Destroy(_inventory[InvenIdx].gameObject);
+                                _inventory[InvenIdx] = null;
+                            }
+                            CUIManager._instance.RefreshInventory();
                         }
-                        CUIManager._instance.RefreshInventory();
                     }
                 }
                 break;
