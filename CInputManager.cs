@@ -22,7 +22,7 @@ public class CInputManager : MonoBehaviour
 
     void Start()
     {
-        _player = GameObject.Find("Player").GetComponent<CPlayer>();
+        _player = GameObject.FindWithTag("Player").GetComponent<CPlayer>();
     }
 
     void Update()

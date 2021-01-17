@@ -26,7 +26,7 @@ public class CItemDrag : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDra
 
     private void Start()
     {
-        _player = GameObject.Find("Player").GetComponent<CPlayer>();
+        _player = GameObject.FindWithTag("Player").GetComponent<CPlayer>();
     }
 
     public void OnBeginDrag(PointerEventData eventData)

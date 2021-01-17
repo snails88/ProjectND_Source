@@ -41,7 +41,7 @@ public class CSlime : CCreature
 
     void Start()
     {
-        _player = GameObject.Find("Player").GetComponent<CPlayer>();
+        _player = GameObject.FindWithTag("Player").GetComponent<CPlayer>();
         _attack.Attacking = false;
         _attack.WaitAfter = new WaitForSeconds(_attack.DelayAfter);
         _attack.WaitBefore = new WaitForSeconds(_attack.DelayBefore);

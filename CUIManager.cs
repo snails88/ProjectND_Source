@@ -38,7 +38,7 @@ public class CUIManager : MonoBehaviour
 
     private void Start()
     {
-        _player = GameObject.Find("Player").GetComponent<CPlayer>();
+        _player = GameObject.FindWithTag("Player").GetComponent<CPlayer>();
         _UIInventory = GameObject.Find("InventoryUI");
         for (int i = 0; i < (int)INVENTORY.CAPACITY; i++)
         {

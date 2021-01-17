@@ -14,7 +14,7 @@ public abstract class ACItem : MonoBehaviour, IInteractionObject
 
     protected void Awake()
     {
-        _player = GameObject.Find("Player").GetComponent<CPlayer>();
+        _player = GameObject.FindWithTag("Player").GetComponent<CPlayer>();
     }
 
     protected void OnTriggerEnter2D(Collider2D collision)

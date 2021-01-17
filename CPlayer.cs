@@ -79,7 +79,6 @@ public abstract class CPlayer : CCreature
 
     protected virtual void Awake()
     {
-        gameObject.name = "Player";
         _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed);
         _evasion.Evasing = false;
         _evasion.Evasionable = true;
