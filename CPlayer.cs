@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Constants;
 
-public class CPlayer : MonoBehaviour, ICollisionObject
+public abstract class CPlayer : CCreature
 {
     [System.Serializable]
-    struct AttackVars
+    protected struct AttackVars
     {
         public float AttackSpeed;
         public float AttackDistance;
@@ -22,7 +22,7 @@ public class CPlayer : MonoBehaviour, ICollisionObject
     }
 
     [System.Serializable]
-    struct EvasionVars
+    protected struct EvasionVars
     {
         public float EvasionSpeed;
         public float EvasionTime;
@@ -39,39 +39,35 @@ public class CPlayer : MonoBehaviour, ICollisionObject
         [HideInInspector]
         public WaitForSeconds WaitEvasionCD;
     }
-
-    [SerializeField]
-    private EvasionVars _evasion;
-    [SerializeField]
-    private AttackVars _attack;
-    [SerializeField]
-    private float _moveSpeed;
-
-    private Vector3 _mousePos;
-    private Transform _invenTransform;
-    private Transform _equipTransform;
-    private Transform _graphicTransform;
     
-
-    private CEquipment[] _equips = new CEquipment[(int)EQUIP_SLOT.EQUIP_SLOT_END];
+    [SerializeField]
+    protected EvasionVars _evasion;
+    [SerializeField]
+    protected AttackVars _attack;
+    protected Vector3 _mousePos;
+    protected Animator _animator;
+    protected int _runParameterHash;
+    protected int _hitParameterHash;
+    protected SpriteRenderer _spriteRenderer;
+    protected Transform _invenTransform;
+    protected Transform _equipTransform;
+    protected CEquipment[] _equips = new CEquipment[(int)EQUIP_SLOT.EQUIP_SLOT_END];
     public CEquipment[] Equips
     {
         get { return _equips; }
     }
-
-    private ACItem[] _inventory = new ACItem[(int)INVENTORY.CAPACITY];
+    protected ACItem[] _inventory = new ACItem[(int)INVENTORY.CAPACITY];
     public ACItem[] Inventory
     {
         get { return _inventory; }
     }
-
-    private ACItem[] _quickSlots = new ACItem[(int)QUICK_SLOT.CAPACITY];
+    protected ACItem[] _quickSlots = new ACItem[(int)QUICK_SLOT.CAPACITY];
     public ACItem[] QuickSlots
     {
         get { return _quickSlots; }
     }
 
-    private void Awake()
+    protected virtual void Awake()
     {
         gameObject.name = "Player";
         _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed);
@@ -81,13 +77,24 @@ public class CPlayer : MonoBehaviour, ICollisionObject
         _evasion.WaitEvasionCD = new WaitForSeconds(_evasion.EvasionCooldown);
         _invenTransform = transform.Find("Inventory");
         _equipTransform = transform.Find("Equip");
-        _graphicTransform = transform.Find("Graphic");
+        _spriteRenderer = transform.Find("Graphic").GetComponent<SpriteRenderer>();
+        _animator = _spriteRenderer.gameObject.GetComponent<Animator>();
+        _runParameterHash = Animator.StringToHash("Run");
+        _hitParameterHash = Animator.StringToHash("Hit");
+        _hP = _maxHP;
+        _waitHit = new WaitForSeconds(_hitTime);
+        _waitHitColor = new WaitForSeconds(_hitColorTime);
     }
 
-    void Start()
+    protected virtual void Start()
     {
         _attack.Attackable = true;
         StartCoroutine("CoroutineAttackable");
+    }
+
+    protected virtual void Update()
+    {
+        LookAtMousePointer();
     }
 
     public void Move(in Vector2 dir)
@@ -96,13 +103,25 @@ public class CPlayer : MonoBehaviour, ICollisionObject
             transform.Translate(dir * Time.deltaTime * _moveSpeed);
     }
 
+    public void SetRunAnim(bool run)
+    {
+        _animator.SetBool(_runParameterHash, run);
+    }
+
+    private void LookAtMousePointer()
+    {
+        if (!_evasion.Evasing)
+        {
+            _mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            _spriteRenderer.flipX = transform.position.x - _mousePos.x > 0 ? true : false;
+        }
+    }
+
     public void Attack()
     {
         if(_attack.Attackable)
         {
-            _mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             _mousePos.z = transform.position.z;
-
             _attack.AttackPos = (_mousePos - transform.position).normalized * _attack.AttackDistance + transform.position;
             _attack.AttackAngle = Mathf.Atan2(_mousePos.y - transform.position.y, _mousePos.x - transform.position.x) * Mathf.Rad2Deg;
             CAttack attack;
@@ -131,12 +150,22 @@ public class CPlayer : MonoBehaviour, ICollisionObject
         }
     }
 
-    public void Hit(float dmg)
+    public override void Hit(float dmg)
     {
         if(!_evasion.Evasing)
         {
-
+            _hP -= dmg;
+            StartCoroutine(CoroutineHit());
+            if(_hP < 0f)
+            {
+                Die();
+            }
         }
+    }
+
+    protected override void Die()
+    {
+        print("꽤꼬닼");
     }
 
     // 추가 성공, 실패 반환
@@ -289,7 +318,7 @@ public class CPlayer : MonoBehaviour, ICollisionObject
             _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
     }
 
-    private bool SwapEquipToInventory(int equipIdx, int invenIdx)
+    protected bool SwapEquipToInventory(int equipIdx, int invenIdx)
     {
         if (_inventory[invenIdx] is CEquipment)
         {
@@ -311,7 +340,7 @@ public class CPlayer : MonoBehaviour, ICollisionObject
             return false;
     }
 
-    private void RegisterItemToQuickSlot(int startItemIdx, int quickSlotIdx)
+    protected void RegisterItemToQuickSlot(int startItemIdx, int quickSlotIdx)
     {
         if(startItemIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
             _quickSlots[quickSlotIdx] = _equips[startItemIdx];
@@ -423,16 +452,9 @@ public class CPlayer : MonoBehaviour, ICollisionObject
         return false;
     }
 
-    public void Evasion(in Vector3 dir)
-    {
-        if (_evasion.Evasionable && !_evasion.Evasing && dir != Vector3.zero)
-        {
-            _evasion.EvasionDir = dir.normalized;
-            StartCoroutine("CoroutineEvasion");
-        }
-    }
+    public abstract void Evasion(in Vector3 dir);
 
-    IEnumerator CoroutineAttackable()
+    protected IEnumerator CoroutineAttackable()
     {
         while (true)
         {
@@ -446,27 +468,13 @@ public class CPlayer : MonoBehaviour, ICollisionObject
         }
     }
 
-    IEnumerator CoroutineEvasion()
+    protected IEnumerator CoroutineHit()
     {
-        _evasion.Evasionable = false;
-        _evasion.Evasing = true;
-        _attack.Attackable = false;
-        StartCoroutine("CoroutineEvade");
-        yield return _evasion.WaitEvasion;
-        _evasion.Evasing = false;
-        _attack.Attackable = true;
-        yield return _evasion.WaitEvasionCD;
-        _evasion.Evasionable = true;
-    }
-
-    IEnumerator CoroutineEvade()
-    {
-        while (_evasion.Evasing)
-        {
-            transform.Translate(_evasion.EvasionDir * _evasion.EvasionSpeed * Time.deltaTime);
-            _graphicTransform.Rotate(Vector3.forward, 360f / _evasion.EvasionTime * Time.deltaTime);
-            yield return null;
-        }
-        _graphicTransform.rotation = Quaternion.Euler(Vector3.zero);
+        _animator.SetBool(_hitParameterHash, true);
+        _spriteRenderer.color = _hitColor;
+        yield return _waitHitColor;
+        _spriteRenderer.color = Color.white;
+        yield return _waitHit;
+        _animator.SetBool(_hitParameterHash, false);
     }
 }

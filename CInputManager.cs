@@ -43,7 +43,10 @@ public class CInputManager : MonoBehaviour
         {
             _moveDir.Normalize();
             _player.Move(_moveDir);
+            _player.SetRunAnim(true);
         }
+        else
+            _player.SetRunAnim(false);
     }
 
     void PlayerAttack()

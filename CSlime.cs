@@ -3,15 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Constants;
 
-public class CSlime : MonoBehaviour, ICollisionObject
+public class CSlime : CCreature
 {
     private CPlayer _player;
 
-    [SerializeField]
-    private float _moveSpeed;
-    [SerializeField]
-    private float _maxHP;
-    private float _hP;
     [SerializeField]
     private float _hPBarAddYPos;
 
@@ -65,7 +60,7 @@ public class CSlime : MonoBehaviour, ICollisionObject
             Move();
     }
 
-    public void Hit(float dmg)
+    public override void Hit(float dmg)
     {
         _hP -= dmg;
 
@@ -90,7 +85,7 @@ public class CSlime : MonoBehaviour, ICollisionObject
         _hPBar.GetComponent<CHPBar>().SetFillAmount(_hP / _maxHP);
     }
 
-    void Die()
+    protected override void Die()
     {
         if(GetComponentInChildren<CAttack>())
         {
