@@ -56,17 +56,13 @@ public class CCameraShake : MonoBehaviour
 
     IEnumerator CoroutineShaking()
     {
-        float currenttime = 0f;
         while (_shake)
         {
             transform.position += _dir * _force;
             _dir *= -1;
             _force -= _force * Time.deltaTime / _shakeTime;
-            currenttime += Time.deltaTime;
             if (_force < 0f)
                 _force = 0f;
-            print("force = " +_force);
-            print(currenttime);
             yield return null;
         }
         yield return null;
