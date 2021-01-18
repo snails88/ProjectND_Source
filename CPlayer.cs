@@ -5,45 +5,30 @@ using Constants;
 
 public abstract class CPlayer : CCreature
 {
-    [System.Serializable]
-    protected struct AttackVars
+    [System.Serializable] protected struct AttackVars
     {
         public float AttackSpeed;
         public float AttackDistance;
-
-        [HideInInspector]
-        public bool Attackable;
-        [HideInInspector]
-        public Vector2 AttackPos;
-        [HideInInspector]
-        public float AttackAngle;
-        [HideInInspector]
-        public WaitForSeconds WaitAttack;
+        [HideInInspector] public bool Attackable;
+        [HideInInspector] public Vector2 AttackPos;
+        [HideInInspector] public float AttackAngle;
+        [HideInInspector] public WaitForSeconds WaitAttack;
     }
 
-    [System.Serializable]
-    protected struct EvasionVars
+    [System.Serializable] protected struct EvasionVars
     {
         public float EvasionSpeed;
         public float EvasionTime;
         public float EvasionCooldown;
-
-        [HideInInspector]
-        public bool Evasing;
-        [HideInInspector]
-        public bool Evasionable;
-        [HideInInspector]
-        public Vector3 EvasionDir;
-        [HideInInspector]
-        public WaitForSeconds WaitEvasion;
-        [HideInInspector]
-        public WaitForSeconds WaitEvasionCD;
+        [HideInInspector] public bool Evasing;
+        [HideInInspector] public bool Evasionable;
+        [HideInInspector] public Vector3 EvasionDir;
+        [HideInInspector] public WaitForSeconds WaitEvasion;
+        [HideInInspector] public WaitForSeconds WaitEvasionCD;
     }
     
-    [SerializeField]
-    protected EvasionVars _evasion;
-    [SerializeField]
-    protected AttackVars _attack;
+    [SerializeField] protected EvasionVars _evasion;
+    [SerializeField] protected AttackVars _attack;
     protected Vector3 _mousePos;
     protected Animator _animator;
     protected int _runParameterHash;
@@ -51,46 +36,16 @@ public abstract class CPlayer : CCreature
     protected SpriteRenderer _spriteRenderer;
     protected Transform _invenTransform;
     protected Transform _equipTransform;
-    protected float _resource;
-    public float Resource
-    {
-        get { return _resource; }
-    }
-    protected float _maxResource;
-    public float MaxResource
-    {
-        get { return _maxResource; }
-    }
-    protected Color _resourceColor;
-    public Color ResourceColor
-    {
-        get { return _resourceColor; }
-    }
-    protected CEquipment[] _equips = new CEquipment[(int)EQUIP_SLOT.EQUIP_SLOT_END];
-    public CEquipment[] Equips
-    {
-        get { return _equips; }
-    }
-    protected ACItem[] _inventory = new ACItem[(int)INVENTORY.CAPACITY];
-    public ACItem[] Inventory
-    {
-        get { return _inventory; }
-    }
-    protected ACItem[] _quickSlots = new ACItem[(int)QUICK_SLOT.CAPACITY];
-    public ACItem[] QuickSlots
-    {
-        get { return _quickSlots; }
-    }
 
-    public float HP
-    {
-        get { return _hP; }
-    }
+    public float HP { get { return _hP; } }
+    public float MaxHP { get { return _maxHP; } }
 
-    public float MaxHP
-    {
-        get { return _maxHP; }
-    }
+    public float Resource { get; protected set; }
+    public float MaxResource { get; protected set;  }
+    public Color ResourceColor { get; protected set; }
+    public CEquipment[] Equips { get; } = new CEquipment[(int)EQUIP_SLOT.EQUIP_SLOT_END];
+    public ACItem[] Inventory { get; } = new ACItem[(int)INVENTORY.CAPACITY];
+    public ACItem[] QuickSlots { get; } = new ACItem[(int)QUICK_SLOT.CAPACITY];
 
     protected virtual void Awake()
     {
@@ -151,8 +106,8 @@ public abstract class CPlayer : CCreature
             CAttack attack;
             if (CGameManager._instance.AttackObjectPoolIsEmpty())
             {
-                if (_equips[(int)EQUIP_SLOT.WEAPON])
-                    attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype((int)((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).AttackType), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward)).GetComponent<CAttack>();
+                if (Equips[(int)EQUIP_SLOT.WEAPON])
+                    attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype((int)((CWeapon)Equips[(int)EQUIP_SLOT.WEAPON]).AttackType), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward)).GetComponent<CAttack>();
                 else
                     attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype(PROTOTYPE_ATTACK.BASIC), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward)).GetComponent<CAttack>();
                 attack.Damage = 1f;
@@ -161,8 +116,8 @@ public abstract class CPlayer : CCreature
             {
                 attack = CGameManager._instance.PopAttackObjectByPool().GetComponent<CAttack>();
                 attack.gameObject.SetActive(true);
-                if (_equips[(int)EQUIP_SLOT.WEAPON])
-                    attack.SetAttack(((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).AttackType, 1f);
+                if (Equips[(int)EQUIP_SLOT.WEAPON])
+                    attack.SetAttack(((CWeapon)Equips[(int)EQUIP_SLOT.WEAPON]).AttackType, 1f);
                 else
                     attack.SetAttack(PROTOTYPE_ATTACK.BASIC, 1f);
                 attack.transform.rotation = Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward);
@@ -201,7 +156,7 @@ public abstract class CPlayer : CCreature
         int index = -1;
         for (int i = 0; i < (int)INVENTORY.CAPACITY; i++)
         {
-            if (_inventory[i] == null)
+            if (Inventory[i] == null)
             {
                 index = i;
                 break;
@@ -210,7 +165,7 @@ public abstract class CPlayer : CCreature
 
         if(index != -1)
         {
-            _inventory[index] = item;
+            Inventory[index] = item;
             item.transform.SetParent(_invenTransform);
             item.gameObject.SetActive(false);
             CUIManager._instance.RefreshInventory();
@@ -227,22 +182,22 @@ public abstract class CPlayer : CCreature
         int index = -1;
         for (int i = 0; i < (int)INVENTORY.CAPACITY; i++)
         {
-            if(_inventory[i] is CPotion)
+            if(Inventory[i] is CPotion)
             {
-                if(((CPotion)_inventory[i]).Sort == item.Sort)
+                if(((CPotion)Inventory[i]).Sort == item.Sort)
                 {
-                    ++((CPotion)_inventory[i]).Count;
+                    ++((CPotion)Inventory[i]).Count;
                     Destroy(item.gameObject);
                     CUIManager._instance.RefreshInventory();
                     return true;
                 }
             }
-            if (_inventory[i] == null && index == -1)
+            if (Inventory[i] == null && index == -1)
                 index = i;
         }
         if (index != -1)
         {
-            _inventory[index] = item;
+            Inventory[index] = item;
             ++item.Count;
             item.transform.SetParent(_invenTransform);
             item.gameObject.SetActive(false);
@@ -255,19 +210,19 @@ public abstract class CPlayer : CCreature
 
     public void UseItem(int InvenIdx)
     {
-        if (_inventory[InvenIdx])
-            _inventory[InvenIdx].UseItem(InvenIdx);
+        if (Inventory[InvenIdx])
+            Inventory[InvenIdx].UseItem(InvenIdx);
     }
 
     public void UseQuickSlotItem(int quickSlotIdx)
     {
-        if (_quickSlots[quickSlotIdx])
+        if (QuickSlots[quickSlotIdx])
         {
             int index = -1;
 
             for (int i = 0; i < (int)INVENTORY.CAPACITY; i++)
             {
-                if (_quickSlots[quickSlotIdx] == _inventory[i])
+                if (QuickSlots[quickSlotIdx] == Inventory[i])
                 {
                     index = i;
                     break;
@@ -275,9 +230,9 @@ public abstract class CPlayer : CCreature
             }
             if (index != -1)
             {
-                _quickSlots[quickSlotIdx].UseItem(index);
-                if (!_quickSlots[quickSlotIdx] || _quickSlots[quickSlotIdx].InventoryExpress == 0)
-                    _quickSlots[quickSlotIdx] = null;
+                QuickSlots[quickSlotIdx].UseItem(index);
+                if (!QuickSlots[quickSlotIdx] || QuickSlots[quickSlotIdx].InventoryExpress == 0)
+                    QuickSlots[quickSlotIdx] = null;
                 CUIManager._instance.RefreshInventory();
             }
         }
@@ -285,22 +240,22 @@ public abstract class CPlayer : CCreature
 
     public void UsePotion(int InvenIdx)
     {
-        switch (((CPotion)_inventory[InvenIdx]).Sort)
+        switch (((CPotion)Inventory[InvenIdx]).Sort)
         {
             case POTION.HEALING:
                 {
-                    if (((CPotion)_inventory[InvenIdx]).Count > 0)
+                    if (((CPotion)Inventory[InvenIdx]).Count > 0)
                     {
                         if (_hP < _maxHP)
                         {
                             _hP += _maxHP * 0.5f;
                             if (_hP > _maxHP)
                                 _hP = _maxHP;
-                            --((CPotion)_inventory[InvenIdx]).Count;
-                            if (((CPotion)_inventory[InvenIdx]).Count == 0)
+                            --((CPotion)Inventory[InvenIdx]).Count;
+                            if (((CPotion)Inventory[InvenIdx]).Count == 0)
                             {
-                                Destroy(_inventory[InvenIdx].gameObject);
-                                _inventory[InvenIdx] = null;
+                                Destroy(Inventory[InvenIdx].gameObject);
+                                Inventory[InvenIdx] = null;
                             }
                             CUIManager._instance.RefreshInventory();
                         }
@@ -312,9 +267,9 @@ public abstract class CPlayer : CCreature
 
     public void ReleaseEquip(int equipIdx)
     {
-        if(AddItemToInventory(_equips[equipIdx]))
+        if(AddItemToInventory(Equips[equipIdx]))
         {
-            _equips[equipIdx] = null;
+            Equips[equipIdx] = null;
             CUIManager._instance.RefreshInventory();
             if (equipIdx == (int)EQUIP_SLOT.WEAPON)
                 _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed);
@@ -323,43 +278,43 @@ public abstract class CPlayer : CCreature
 
     public void EquipItem(int invenIdx)
     {
-        int equipIdx = (int)((CEquipment)_inventory[invenIdx]).EquipSlot;
-        if (_equips[equipIdx])
+        int equipIdx = (int)((CEquipment)Inventory[invenIdx]).EquipSlot;
+        if (Equips[equipIdx])
         {
-            if (_inventory[invenIdx] is CEquipment)
+            if (Inventory[invenIdx] is CEquipment)
             {
-                ACItem temp = _equips[equipIdx];
-                _equips[equipIdx] = (CEquipment)_inventory[invenIdx];
-                _equips[equipIdx].transform.SetParent(_equipTransform);
-                _inventory[invenIdx] = null;
+                ACItem temp = Equips[equipIdx];
+                Equips[equipIdx] = (CEquipment)Inventory[invenIdx];
+                Equips[equipIdx].transform.SetParent(_equipTransform);
+                Inventory[invenIdx] = null;
                 AddItemToInventory(temp);
             }
         }
         else
         {
-            _equips[equipIdx] = (CEquipment)_inventory[invenIdx];
-            _equips[equipIdx].transform.SetParent(_equipTransform);
-            _inventory[invenIdx] = null;
+            Equips[equipIdx] = (CEquipment)Inventory[invenIdx];
+            Equips[equipIdx].transform.SetParent(_equipTransform);
+            Inventory[invenIdx] = null;
         }
 
         // 무기바꾸면 무기공격속도 적용
         if (equipIdx == (int)EQUIP_SLOT.WEAPON)
-            _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
+            _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)Equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
     }
 
     protected bool SwapEquipToInventory(int equipIdx, int invenIdx)
     {
-        if (_inventory[invenIdx] is CEquipment)
+        if (Inventory[invenIdx] is CEquipment)
         {
-            if ((int)((CEquipment)_inventory[invenIdx]).EquipSlot == equipIdx)
+            if ((int)((CEquipment)Inventory[invenIdx]).EquipSlot == equipIdx)
             {
-                ACItem temp = _equips[equipIdx];
-                _equips[equipIdx] = (CEquipment)_inventory[invenIdx];
-                _equips[equipIdx].transform.SetParent(_equipTransform);
-                _inventory[invenIdx] = temp;
-                _inventory[invenIdx].transform.SetParent(_invenTransform);
-                if (_equips[equipIdx].EquipSlot == EQUIP_SLOT.WEAPON)
-                    _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)_equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
+                ACItem temp = Equips[equipIdx];
+                Equips[equipIdx] = (CEquipment)Inventory[invenIdx];
+                Equips[equipIdx].transform.SetParent(_equipTransform);
+                Inventory[invenIdx] = temp;
+                Inventory[invenIdx].transform.SetParent(_invenTransform);
+                if (Equips[equipIdx].EquipSlot == EQUIP_SLOT.WEAPON)
+                    _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)Equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
                 return true;
             }
             else
@@ -372,16 +327,16 @@ public abstract class CPlayer : CCreature
     protected void RegisterItemToQuickSlot(int startItemIdx, int quickSlotIdx)
     {
         if(startItemIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
-            _quickSlots[quickSlotIdx] = _equips[startItemIdx];
+            QuickSlots[quickSlotIdx] = Equips[startItemIdx];
 
         // 퀵슬롯에서 퀵슬롯 스왑은 DragItemSlot에서 처리함.
         else
-            _quickSlots[quickSlotIdx] = _inventory[startItemIdx - (int)EQUIP_SLOT.EQUIP_SLOT_END];
+            QuickSlots[quickSlotIdx] = Inventory[startItemIdx - (int)EQUIP_SLOT.EQUIP_SLOT_END];
     }
 
     public void RemoveItemFromQuickSlot(int quickSlotIdx)
     {
-        _quickSlots[quickSlotIdx] = null;
+        QuickSlots[quickSlotIdx] = null;
     }
 
     public bool DragItemSlot(int startIdx, int destIdx)
@@ -392,9 +347,9 @@ public abstract class CPlayer : CCreature
             if (destIdx >= (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
             {
                 destIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY;
-                ACItem temp = _quickSlots[destIdx];
-                _quickSlots[destIdx] = _quickSlots[startIdx];
-                _quickSlots[startIdx] = temp;
+                ACItem temp = QuickSlots[destIdx];
+                QuickSlots[destIdx] = QuickSlots[startIdx];
+                QuickSlots[startIdx] = temp;
                 return true;
             }
             // 버튼말고 밖으로 빼는 경우는 CItemDrag.OnEndDrag에서 바로 처리.
@@ -403,7 +358,7 @@ public abstract class CPlayer : CCreature
         else if (destIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
         {
             // 목표아이템이 장비슬롯에있으면
-            if (_equips[destIdx])
+            if (Equips[destIdx])
             {
                 // 바꿀 시작 아이템이 장비슬롯에있으면 리턴 (의미없으니)
                 if (startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
@@ -421,7 +376,7 @@ public abstract class CPlayer : CCreature
                 if (startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
                 {
                     startIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END;
-                    if (_inventory[startIdx] is CEquipment && (int)((CEquipment)_inventory[startIdx]).EquipSlot == destIdx)
+                    if (Inventory[startIdx] is CEquipment && (int)((CEquipment)Inventory[startIdx]).EquipSlot == destIdx)
                     {
                         // EquipItem 들어가서 검사 중복으로 하는 문제있음
                         EquipItem(startIdx);
@@ -440,11 +395,11 @@ public abstract class CPlayer : CCreature
             // 시작 아이템이 장비슬롯에있으면
             if (startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
             {
-                if(!_inventory[destIdx])
+                if(!Inventory[destIdx])
                 {
-                    _inventory[destIdx] = _equips[startIdx];
-                    _equips[startIdx] = null;
-                    _inventory[destIdx].transform.SetParent(_invenTransform);
+                    Inventory[destIdx] = Equips[startIdx];
+                    Equips[startIdx] = null;
+                    Inventory[destIdx].transform.SetParent(_invenTransform);
                     if (startIdx == (int)EQUIP_SLOT.WEAPON)
                         _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed);
                     return true;
@@ -457,16 +412,16 @@ public abstract class CPlayer : CCreature
             {
                 startIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END;
 
-                if(_inventory[destIdx])
+                if(Inventory[destIdx])
                 {
-                    ACItem temp = _inventory[destIdx];
-                    _inventory[destIdx] = _inventory[startIdx];
-                    _inventory[startIdx] = temp;
+                    ACItem temp = Inventory[destIdx];
+                    Inventory[destIdx] = Inventory[startIdx];
+                    Inventory[startIdx] = temp;
                 }
                 else
                 {
-                    _inventory[destIdx] = _inventory[startIdx];
-                    _inventory[startIdx] = null;
+                    Inventory[destIdx] = Inventory[startIdx];
+                    Inventory[startIdx] = null;
                 }
                 return true;
             }

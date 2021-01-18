@@ -7,9 +7,7 @@ public class CGameManager : MonoBehaviour
 {
     public static CGameManager _instance;
 
-    [SerializeField]
-    private GameObject[] _attackObjectPrototypes;
-
+    [SerializeField] private GameObject[] _attackObjectPrototypes;
     private Queue<GameObject> _attackObjectPool = new Queue<GameObject>();
 
     private void Awake()

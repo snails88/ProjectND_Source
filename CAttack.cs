@@ -5,26 +5,16 @@ using Constants;
 
 public class CAttack : MonoBehaviour
 {
-    [SerializeField]
-    private float _lifeTime;
-
-    [SerializeField]
-    private string _ownerTag;
-
+    [SerializeField] private float _lifeTime;
+    [SerializeField] private string _ownerTag;
     private List<GameObject> _hitList = new List<GameObject>();
-
     private GameObject _objectPoolObject;
     private GameObject _graphicObject;
     private GameObject _prototypePrefab;
     private Transform _prototypeGraphicTransform;
+    private WaitForSeconds _wait;
 
-    WaitForSeconds _wait;
-
-    public float Damage
-    {
-        get;
-        set;
-    }
+    public float Damage { get; set; }
 
     private void Awake()
     {
@@ -41,11 +31,6 @@ public class CAttack : MonoBehaviour
     public void LifeTimeCoroutineStart()
     {
         StartCoroutine("CoroutineLifeTime");
-    }
-
-    void Update()
-    {
-
     }
 
     public void SetAttack(PROTOTYPE_ATTACK prototype, float dmg)

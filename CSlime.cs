@@ -5,15 +5,7 @@ using Constants;
 
 public class CSlime : CCreature
 {
-    private CPlayer _player;
-
-    [SerializeField]
-    private float _hPBarAddYPos;
-
-    private GameObject _hPBar;
-
-    [System.Serializable]
-    private struct AttackVars
+    [System.Serializable] private struct AttackVars
     {
         public float DelayBefore;
         public float DelayAfter;
@@ -33,11 +25,11 @@ public class CSlime : CCreature
         public bool Attacking;
     }
 
-    [SerializeField]
-    private AttackVars _attack;
-
+    [SerializeField] private AttackVars _attack;
+    [SerializeField] private float _hPBarAddYPos;
+    private CPlayer _player;
+    private GameObject _hPBar;
     private Vector3 _moveDir;
-
 
     void Start()
     {

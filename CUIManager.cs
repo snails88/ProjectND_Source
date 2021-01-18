@@ -8,7 +8,7 @@ public class CUIManager : MonoBehaviour
 {
     public static CUIManager _instance;
 
-    private int _mouseOverIdx = -1;
+    [SerializeField] private GameObject _hPBarPrefab;
     private GameObject _UIInventory;
     private Image[] _inventoryImages = new Image[(int)INVENTORY.CAPACITY];
     private Text[] _inventoryTexts = new Text[(int)INVENTORY.CAPACITY];
@@ -20,16 +20,9 @@ public class CUIManager : MonoBehaviour
     private Image _playerResourceProgressBar;
     private CPlayer _player;
     private Queue<GameObject> _hPBarPool = new Queue<GameObject>();
-    [SerializeField]
-    private GameObject _hPBarPrefab;
-    public GameObject HPBarPrefab
-    {
-        get { return _hPBarPrefab; }
-    }
-    public int MouseOverIndex
-    {
-        get { return _mouseOverIdx; }
-    }
+    
+    public GameObject HPBarPrefab { get { return _hPBarPrefab; } }
+    public int MouseOverIndex { get; protected set; } = -1;
 
     private void Awake()
     {
@@ -161,24 +154,24 @@ public class CUIManager : MonoBehaviour
 
     public void OnMouseOverEquip(int index)
     {
-        _mouseOverIdx = index;
-        print(_mouseOverIdx);
+        MouseOverIndex = index;
+        print(MouseOverIndex);
     }
 
     public void OnMouseOverInventory(int index)
     {
-        _mouseOverIdx = index + (int)EQUIP_SLOT.EQUIP_SLOT_END;
-        print(_mouseOverIdx);
+        MouseOverIndex = index + (int)EQUIP_SLOT.EQUIP_SLOT_END;
+        print(MouseOverIndex);
     }
 
     public void OnMouseOverQuickSlot(int index)
     {
-        _mouseOverIdx = index + (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY;
-        print(_mouseOverIdx);
+        MouseOverIndex = index + (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY;
+        print(MouseOverIndex);
     }
 
     public void ExitMouse()
     {
-        _mouseOverIdx = -1;
+        MouseOverIndex = -1;
     }
 }

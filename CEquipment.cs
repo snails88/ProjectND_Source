@@ -5,8 +5,7 @@ using Constants;
 
 public class CEquipment : ACItem
 {
-    [SerializeField]
-    private EQUIP_SLOT _equipSlot;
+    [SerializeField] private EQUIP_SLOT _equipSlot;
     private int _lv = 1;
 
     public int Lv
@@ -14,16 +13,8 @@ public class CEquipment : ACItem
         get { return _lv; }
         set { _lv = value; }
     }
-
-    public override int InventoryExpress
-    {
-        get { return _lv; }
-    }
-
-    public EQUIP_SLOT EquipSlot
-    {
-        get { return _equipSlot; }
-    }
+    public override int InventoryExpress { get { return _lv; } }
+    public EQUIP_SLOT EquipSlot { get { return _equipSlot; } }
 
     public override void Interaction()
     {

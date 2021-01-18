@@ -11,7 +11,6 @@ public class CInputManager : MonoBehaviour
     private Vector2 _moveDir;
     private string _horizon = "Horizontal";
     private string _vertical = "Vertical";
-
     private LinkedList<GameObject> _interactionList = new LinkedList<GameObject>();
 
     private void Awake()

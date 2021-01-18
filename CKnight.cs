@@ -4,31 +4,29 @@ using UnityEngine;
 
 public class CKnight : CPlayer
 {
+    [SerializeField] private float _furyReleaseTime;
+    [SerializeField] private float _furyDecreaseAmount;
     private Transform _graphicTransform;
     private bool _furyRelease = true;
     private WaitForSeconds _waitFuryRelease;
-    [SerializeField]
-    private float _furyReleaseTime;
-    [SerializeField]
-    private float _furyDecreaseAmount;
 
     protected override void Awake()
     {
         base.Awake();
         _graphicTransform = transform.Find("Graphic");
-        _resourceColor = Color.red;
-        _maxResource = 100f;
+        ResourceColor = Color.red;
         _waitFuryRelease = new WaitForSeconds(_furyReleaseTime);
+        MaxResource = 100f;
     }
 
     protected override void Update()
     {
         base.Update();
-        if(_furyRelease && _resource > 0f)
+        if(_furyRelease && Resource > 0f)
         {
-            _resource -= _furyDecreaseAmount * Time.deltaTime;
-            if (_resource < 0f)
-                _resource = 0f;
+            Resource -= _furyDecreaseAmount * Time.deltaTime;
+            if (Resource < 0f)
+                Resource = 0f;
         }    
     }
 
@@ -86,7 +84,7 @@ public class CKnight : CPlayer
 
     private IEnumerator CoroutineFury(float fury)
     {
-        _resource += fury;
+        Resource += fury;
         _furyRelease = false;
         yield return _waitFuryRelease;
         _furyRelease = true;

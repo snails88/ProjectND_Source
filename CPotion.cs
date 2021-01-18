@@ -5,26 +5,11 @@ using Constants;
 
 public class CPotion : ACItem
 {
-    [SerializeField]
-    private POTION _sort;
-    
-    private int _count;
+    [SerializeField] private POTION _sort;
 
-    public POTION Sort
-    {
-        get { return _sort; }
-    }
-
-    public int Count
-    {
-        get { return _count; }
-        set { _count = value; }
-    }
-
-    public override int InventoryExpress
-    {
-        get { return _count; }
-    }
+    public POTION Sort{ get { return _sort; } }
+    public int Count { get; set; }
+    public override int InventoryExpress { get { return Count; } }
 
     public override void UseItem(int InvenIdx)
     {

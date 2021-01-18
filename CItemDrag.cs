@@ -7,15 +7,14 @@ using Constants;
 
 public class CItemDrag : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
+    private static int _startIndex;
+    private static bool _drag = false;
+
+    [SerializeField] private Image _image;
     private Vector3 _initPos;
     private Transform _initParent;
     private Transform _canvasTransform;
-    [SerializeField]
-    private Image _image;
     private CPlayer _player;
-
-    private static int _startIndex;
-    private static bool _drag = false;
 
     private void Awake()
     {

@@ -6,19 +6,10 @@ using UnityEngine.UI;
 public class CHPBar : MonoBehaviour
 {
     private Vector3 _ownerPos;
-    private float _addYValue = 0f;
-    public float AddYValue
-    {
-        set { _addYValue = value; }
-    }
     private Image _image;
-        
-    //RectTransform _rt;
-    public GameObject Owner
-    {
-        get;
-        set;
-    }
+
+    public float AddYValue { protected get; set; }
+    public GameObject Owner { get; set; }
 
     private void Awake()
     {
@@ -35,7 +26,7 @@ public class CHPBar : MonoBehaviour
         if (Owner)
         {
             _ownerPos = Owner.transform.position;
-            _ownerPos.y += _addYValue;
+            _ownerPos.y += AddYValue;
             transform.position = Camera.main.WorldToScreenPoint(_ownerPos);
         }
     }
