@@ -36,6 +36,7 @@ public abstract class CPlayer : CCreature
     protected SpriteRenderer _spriteRenderer;
     protected Transform _invenTransform;
     protected Transform _equipTransform;
+    protected CHitStop _hitStop;
 
     public float HP { get { return _hP; } }
     public float MaxHP { get { return _maxHP; } }
@@ -58,6 +59,7 @@ public abstract class CPlayer : CCreature
         _equipTransform = transform.Find("Equip");
         _spriteRenderer = transform.Find("Graphic").GetComponent<SpriteRenderer>();
         _animator = _spriteRenderer.gameObject.GetComponent<Animator>();
+        _hitStop = GetComponent<CHitStop>();
         _runParameterHash = Animator.StringToHash("Run");
         _hitParameterHash = Animator.StringToHash("Hit");
         _hP = _maxHP;
@@ -127,6 +129,11 @@ public abstract class CPlayer : CCreature
             attack.transform.SetParent(gameObject.transform);
             _attack.Attackable = false;
         }
+    }
+
+    public void HitStop()
+    {
+        StartCoroutine(_hitStop.CoroutineHitStop());
     }
 
     public override void Hit(float dmg)

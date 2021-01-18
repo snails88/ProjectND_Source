@@ -56,6 +56,8 @@ public class CSlime : CCreature
     {
         _hP -= dmg;
 
+        _player.HitStop();
+
         if (_hP < 0)
         {
             Die();
