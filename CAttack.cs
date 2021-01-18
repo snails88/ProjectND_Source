@@ -11,6 +11,7 @@ public class CAttack : MonoBehaviour
     private GameObject _objectPoolObject;
     private GameObject _graphicObject;
     private GameObject _prototypePrefab;
+    private CCreature _owner;
     private Transform _prototypeGraphicTransform;
     private WaitForSeconds _wait;
 
@@ -33,7 +34,13 @@ public class CAttack : MonoBehaviour
         StartCoroutine("CoroutineLifeTime");
     }
 
-    public void SetAttack(PROTOTYPE_ATTACK prototype, float dmg)
+    public void SetOwner(in CCreature owner)
+    {
+        _owner = owner;
+    }
+
+
+    public void SetAttack(PROTOTYPE_ATTACK prototype, float dmg, in CCreature owner)
     {
         _prototypePrefab = CGameManager._instance.GetAttackObjectPrototype((int)prototype);
         _prototypeGraphicTransform = _prototypePrefab.transform.Find("Graphic");
@@ -46,6 +53,7 @@ public class CAttack : MonoBehaviour
         _wait = new WaitForSeconds(_lifeTime);
         _ownerTag = _prototypePrefab.GetComponent<CAttack>()._ownerTag;
         Damage = dmg;
+        _owner = owner;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -59,9 +67,11 @@ public class CAttack : MonoBehaviour
             }
             _hitList.Add(collision.gameObject);
 
-            if (collision.gameObject.GetComponent<ICollisionObject>() != null)
+            ICollisionObject target = collision.gameObject.GetComponent<ICollisionObject>();
+            if (target != null)
             {
-                collision.gameObject.GetComponent<ICollisionObject>().Hit(Damage);
+                _owner.HitTarget(target);
+                target.Hit(Damage);
             }
         }
     }

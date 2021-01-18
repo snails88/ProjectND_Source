@@ -14,5 +14,6 @@ public abstract class CCreature : MonoBehaviour, ICollisionObject
     protected Color _hitColor = new Color(255f, 0f, 0f, 100f);
 
     public abstract void Hit(float dmg);
+    public abstract void HitTarget(in ICollisionObject target);
     protected abstract void Die();
 }

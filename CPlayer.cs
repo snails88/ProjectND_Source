@@ -29,7 +29,9 @@ public abstract class CPlayer : CCreature
     
     [SerializeField] protected EvasionVars _evasion;
     [SerializeField] protected AttackVars _attack;
+    [SerializeField] protected float _cameraShakeForce;
     protected Vector3 _mousePos;
+    protected Vector3 _hitDir;
     protected Animator _animator;
     protected int _runParameterHash;
     protected int _hitParameterHash;
@@ -37,6 +39,7 @@ public abstract class CPlayer : CCreature
     protected Transform _invenTransform;
     protected Transform _equipTransform;
     protected CHitStop _hitStop;
+    protected CCameraShake _cameraShake;
 
     public float HP { get { return _hP; } }
     public float MaxHP { get { return _maxHP; } }
@@ -65,6 +68,7 @@ public abstract class CPlayer : CCreature
         _hP = _maxHP;
         _waitHit = new WaitForSeconds(_hitTime);
         _waitHitColor = new WaitForSeconds(_hitColorTime);
+        _cameraShake = Camera.main.GetComponent<CCameraShake>();
     }
 
     protected virtual void Start()
@@ -87,6 +91,11 @@ public abstract class CPlayer : CCreature
     public void SetRunAnim(bool run)
     {
         _animator.SetBool(_runParameterHash, run);
+    }
+
+    public void SetHitDirection(Vector3 dir)
+    {
+        _hitDir = dir;
     }
 
     private void LookAtMousePointer()
@@ -113,15 +122,16 @@ public abstract class CPlayer : CCreature
                 else
                     attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype(PROTOTYPE_ATTACK.BASIC), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward)).GetComponent<CAttack>();
                 attack.Damage = 1f;
+                attack.SetOwner((CCreature)this);
             }
             else
             {
                 attack = CGameManager._instance.PopAttackObjectByPool().GetComponent<CAttack>();
                 attack.gameObject.SetActive(true);
                 if (Equips[(int)EQUIP_SLOT.WEAPON])
-                    attack.SetAttack(((CWeapon)Equips[(int)EQUIP_SLOT.WEAPON]).AttackType, 1f);
+                    attack.SetAttack(((CWeapon)Equips[(int)EQUIP_SLOT.WEAPON]).AttackType, 1f, (CCreature)this);
                 else
-                    attack.SetAttack(PROTOTYPE_ATTACK.BASIC, 1f);
+                    attack.SetAttack(PROTOTYPE_ATTACK.BASIC, 1f, (CCreature)this);
                 attack.transform.rotation = Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward);
                 attack.transform.position = _attack.AttackPos;
             }
@@ -129,11 +139,6 @@ public abstract class CPlayer : CCreature
             attack.transform.SetParent(gameObject.transform);
             _attack.Attackable = false;
         }
-    }
-
-    public void HitStop()
-    {
-        StartCoroutine(_hitStop.CoroutineHitStop());
     }
 
     public override void Hit(float dmg)
@@ -147,6 +152,12 @@ public abstract class CPlayer : CCreature
                 Die();
             }
         }
+    }
+
+    public override void HitTarget(in ICollisionObject target)
+    {
+        if (target is CCreature)
+            StartCoroutine(_hitStop.CoroutineHitStop());
     }
 
     protected override void Die()
@@ -461,6 +472,7 @@ public abstract class CPlayer : CCreature
 
     protected IEnumerator CoroutineHit()
     {
+        _cameraShake.StartCameraShake(_hitDir, _cameraShakeForce);
         _animator.SetBool(_hitParameterHash, true);
         _spriteRenderer.color = _hitColor;
         yield return _waitHitColor;

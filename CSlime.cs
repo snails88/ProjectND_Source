@@ -56,8 +56,6 @@ public class CSlime : CCreature
     {
         _hP -= dmg;
 
-        _player.HitStop();
-
         if (_hP < 0)
         {
             Die();
@@ -81,6 +79,14 @@ public class CSlime : CCreature
         if(_player is CKnight)
         {
             ((CKnight)_player).GainFury(5f);
+        }
+    }
+
+    public override void HitTarget(in ICollisionObject target)
+    {
+        if(target == (ICollisionObject)_player)
+        {
+            _player.SetHitDirection((transform.position - _player.transform.position).normalized);
         }
     }
 
@@ -119,12 +125,13 @@ public class CSlime : CCreature
                 {
                     attack = Instantiate(CGameManager._instance.GetAttackObjectPrototype(PROTOTYPE_ATTACK.SLIME), _attack.AttackPos, Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward)).GetComponent<CAttack>();
                     attack.Damage = 1f;
+                    attack.SetOwner((CCreature)this);
                 }
                 else
                 {
                     attack = CGameManager._instance.PopAttackObjectByPool().GetComponent<CAttack>();
                     attack.gameObject.SetActive(true);
-                    attack.SetAttack(PROTOTYPE_ATTACK.SLIME, 1f);
+                    attack.SetAttack(PROTOTYPE_ATTACK.SLIME, 1f, (CCreature)this);
                     attack.transform.rotation = Quaternion.AngleAxis(_attack.AttackAngle, Vector3.forward);
                     attack.transform.position = _attack.AttackPos;
                 }
