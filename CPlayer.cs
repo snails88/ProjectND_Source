@@ -39,7 +39,7 @@ public abstract class CPlayer : CCreature
     protected Transform _invenTransform;
     protected Transform _equipTransform;
     protected CHitStop _hitStop;
-    protected CCameraShake _cameraShake;
+    protected CCamera _camera;
 
     public float HP { get { return _hP; } }
     public float MaxHP { get { return _maxHP; } }
@@ -68,7 +68,7 @@ public abstract class CPlayer : CCreature
         _hP = _maxHP;
         _waitHit = new WaitForSeconds(_hitTime);
         _waitHitColor = new WaitForSeconds(_hitColorTime);
-        _cameraShake = Camera.main.GetComponent<CCameraShake>();
+        _camera = Camera.main.GetComponent<CCamera>();
     }
 
     protected virtual void Start()
@@ -472,7 +472,7 @@ public abstract class CPlayer : CCreature
 
     protected IEnumerator CoroutineHit()
     {
-        _cameraShake.StartCameraShake(_hitDir, _cameraShakeForce);
+        _camera.StartCameraShake(_hitDir, _cameraShakeForce);
         _animator.SetBool(_hitParameterHash, true);
         _spriteRenderer.color = _hitColor;
         yield return _waitHitColor;
