@@ -14,6 +14,7 @@ public class CGameManager : MonoBehaviour
     {
         if (!_instance)
             _instance = this;
+        Screen.SetResolution(1280, 720, false);
     }
 
     public bool AttackObjectPoolIsEmpty()
