@@ -79,7 +79,8 @@ public abstract class CPlayer : CCreature
 
     protected virtual void Update()
     {
-        LookAtMousePointer();
+        if (Time.timeScale != 0f)
+            LookAtMousePointer();
     }
 
     public void Move(in Vector2 dir)
