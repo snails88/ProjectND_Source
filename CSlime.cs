@@ -3,42 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Constants;
 
-public class CSlime : CCreature
+public class CSlime : CEnemy
 {
-    [System.Serializable] private struct AttackVars
+    protected override void Start()
     {
-        public float DelayBefore;
-        public float DelayAfter;
-        public float AttackDistance;
-        public float TargetDistance;
-
-        public WaitForSeconds WaitAfter;
-        public WaitForSeconds WaitBefore;
-
-        [HideInInspector]
-        public Vector3 AttackDir;
-        [HideInInspector]
-        public Vector2 AttackPos;
-        [HideInInspector]
-        public float AttackAngle;
-        [HideInInspector]
-        public bool Attacking;
-    }
-
-    [SerializeField] private AttackVars _attack;
-    [SerializeField] private float _hPBarAddYPos;
-    private CPlayer _player;
-    private GameObject _hPBar;
-    private Vector3 _moveDir;
-
-    void Start()
-    {
-        _player = GameObject.FindWithTag("Player").GetComponent<CPlayer>();
-        _attack.Attacking = false;
-        _attack.WaitAfter = new WaitForSeconds(_attack.DelayAfter);
-        _attack.WaitBefore = new WaitForSeconds(_attack.DelayBefore);
-
-        _hP = _maxHP;
+        base.Start();
         // 이거안해주면 CoroutineAttack 시작할때 한번 때리고 시작함
         _moveDir = _player.transform.position - transform.position;
         StartCoroutine("CoroutineAttack");
@@ -50,61 +19,6 @@ public class CSlime : CCreature
 
         if (!_attack.Attacking)
             Move();
-    }
-
-    public override void Hit(float dmg)
-    {
-        _hP -= dmg;
-
-        if (_hP < 0)
-        {
-            Die();
-            return;
-        }
-
-        if(!_hPBar)
-        {
-            if (CUIManager._instance.HPBarPoolIsEmpty())
-                _hPBar = Instantiate(CUIManager._instance.HPBarPrefab, GameObject.Find("HPBarObjectPool").transform);
-            else
-            {
-                _hPBar = CUIManager._instance.PopHPBarByPool();
-                _hPBar.SetActive(true);
-            }
-            _hPBar.GetComponent<CHPBar>().Owner = gameObject;
-            _hPBar.GetComponent<CHPBar>().AddYValue = _hPBarAddYPos;
-        }
-        _hPBar.GetComponent<CHPBar>().SetFillAmount(_hP / _maxHP);
-
-        if(_player is CKnight)
-        {
-            ((CKnight)_player).GainFury(5f);
-        }
-    }
-
-    public override void HitTarget(in ICollisionObject target)
-    {
-        if(target == (ICollisionObject)_player)
-        {
-            _player.SetHitDirection((transform.position - _player.transform.position).normalized);
-        }
-    }
-
-    protected override void Die()
-    {
-        if(GetComponentInChildren<CAttack>())
-        {
-            GameObject attack = GetComponentInChildren<CAttack>().gameObject;
-            attack.transform.SetParent(CGameManager._instance.transform.Find("AttackObjectPool").transform);
-            CGameManager._instance.AddAttackObjectInPool(attack);
-            attack.SetActive(false);
-        }
-
-        CUIManager._instance.AddHPBarInPool(_hPBar);
-        _hPBar.SetActive(false);
-        _hPBar = null;
-
-        Destroy(gameObject);
     }
 
     void Move()
