@@ -155,19 +155,16 @@ public class CUIManager : MonoBehaviour
     public void OnMouseOverEquip(int index)
     {
         MouseOverIndex = index;
-        print(MouseOverIndex);
     }
 
     public void OnMouseOverInventory(int index)
     {
         MouseOverIndex = index + (int)EQUIP_SLOT.EQUIP_SLOT_END;
-        print(MouseOverIndex);
     }
 
     public void OnMouseOverQuickSlot(int index)
     {
         MouseOverIndex = index + (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY;
-        print(MouseOverIndex);
     }
 
     public void ExitMouse()

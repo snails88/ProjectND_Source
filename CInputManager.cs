@@ -9,8 +9,8 @@ public class CInputManager : MonoBehaviour
 
     private CPlayer _player;
     private Vector2 _moveDir;
-    private string _horizon = "Horizontal";
-    private string _vertical = "Vertical";
+    private const string _horizon = "Horizontal";
+    private const string _vertical = "Vertical";
     private LinkedList<GameObject> _interactionList = new LinkedList<GameObject>();
 
     private void Awake()
