@@ -193,7 +193,7 @@ public abstract class CPlayer : CCreature
         return false;
     }
 
-    public bool AddPotionToInventory(in CPotion item)
+    public bool AddSuppliesToInventory(in CSupplies item)
     {
         if (!item)
             return false;
@@ -201,11 +201,11 @@ public abstract class CPlayer : CCreature
         int index = -1;
         for (int i = 0; i < (int)INVENTORY.CAPACITY; i++)
         {
-            if(Inventory[i] is CPotion)
+            if(Inventory[i] is CSupplies)
             {
-                if(((CPotion)Inventory[i]).Sort == item.Sort)
+                if(((CSupplies)Inventory[i]).Sort == item.Sort)
                 {
-                    ++((CPotion)Inventory[i]).Count;
+                    ++((CSupplies)Inventory[i]).Count;
                     Destroy(item.gameObject);
                     CUIManager._instance.RefreshInventory();
                     return true;
@@ -257,21 +257,21 @@ public abstract class CPlayer : CCreature
         }
     }
 
-    public void UsePotion(int InvenIdx)
+    public void UseSupplies(int InvenIdx)
     {
-        switch (((CPotion)Inventory[InvenIdx]).Sort)
+        switch (((CSupplies)Inventory[InvenIdx]).Sort)
         {
-            case POTION.HEALING:
+            case SUPPLIES.HEALING:
                 {
-                    if (((CPotion)Inventory[InvenIdx]).Count > 0)
+                    if (((CSupplies)Inventory[InvenIdx]).Count > 0)
                     {
                         if (_hP < _maxHP)
                         {
                             _hP += _maxHP * 0.5f;
                             if (_hP > _maxHP)
                                 _hP = _maxHP;
-                            --((CPotion)Inventory[InvenIdx]).Count;
-                            if (((CPotion)Inventory[InvenIdx]).Count == 0)
+                            --((CSupplies)Inventory[InvenIdx]).Count;
+                            if (((CSupplies)Inventory[InvenIdx]).Count == 0)
                             {
                                 Destroy(Inventory[InvenIdx].gameObject);
                                 Inventory[InvenIdx] = null;
