@@ -11,7 +11,7 @@ public abstract class CCreature : MonoBehaviour, ICollisionObject
     [SerializeField] protected WaitForSeconds _waitHit;
     [SerializeField] protected WaitForSeconds _waitHitColor;
     protected float _hP;
-    protected Color _hitColor = new Color(255f, 0f, 0f, 100f);
+    protected Color _hitColor = new Color(1f, 0f, 0f, 1f);
 
     public abstract void Hit(float dmg);
     public abstract void HitTarget(in ICollisionObject target);
