@@ -30,6 +30,12 @@ public class CKnight : CPlayer
         }    
     }
 
+    public override void Hit(float dmg)
+    {
+        base.Hit(dmg);
+        GainFury(dmg);
+    }
+
     public void GainFury(float fury)
     {
         StopCoroutine("CoroutineFury");
