@@ -11,6 +11,7 @@ public class CUIManager : MonoBehaviour
     [SerializeField] private GameObject _hPBarPrefab;
     private GameObject _UIInventory;
     private Image[] _inventoryImages = new Image[(int)INVENTORY.CAPACITY];
+    private Image[] _identifyImage = new Image[(int)INVENTORY.CAPACITY];
     private Text[] _inventoryTexts = new Text[(int)INVENTORY.CAPACITY];
     private Image[] _equipImages = new Image[(int)EQUIP_SLOT.EQUIP_SLOT_END];
     private Text[] _equipTexts = new Text[(int)EQUIP_SLOT.EQUIP_SLOT_END];
@@ -19,6 +20,7 @@ public class CUIManager : MonoBehaviour
     private Image _playerHPProgressBar;
     private Image _playerResourceProgressBar;
     private CPlayer _player;
+    private Color _unidentifiedColor = new Color(1f, 0.5f, 0.5f, 0.5f);
     private Queue<GameObject> _hPBarPool = new Queue<GameObject>();
     
     public GameObject HPBarPrefab { get { return _hPBarPrefab; } }
@@ -37,6 +39,7 @@ public class CUIManager : MonoBehaviour
         for (int i = 0; i < (int)INVENTORY.CAPACITY; i++)
         {
             _inventoryImages[i] = GameObject.Find("InventoryImage_" + i.ToString()).GetComponent<Image>();
+            _identifyImage[i] = GameObject.Find("IdentifyImage_" + i.ToString()).GetComponent<Image>();
             _inventoryTexts[i] = GameObject.Find("InventoryText_" + i.ToString()).GetComponent<Text>();
         }
         for (int i = 0; i < (int)EQUIP_SLOT.EQUIP_SLOT_END; i++)
@@ -89,7 +92,6 @@ public class CUIManager : MonoBehaviour
             _UIInventory.SetActive(true);
             CGameManager._instance.SetTimeScale(0f);
         }
-        // _UIInventory.SetActive(!_UIInventory.activeSelf);
     }
 
     public void RefreshInventory()
@@ -100,11 +102,13 @@ public class CUIManager : MonoBehaviour
             {
                 _inventoryImages[i].sprite = _player.Inventory[i].gameObject.transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
                 _inventoryTexts[i].text = _player.Inventory[i].InventoryExpress.ToString();
+                _identifyImage[i].color = _player.Inventory[i].Identified ? Color.clear : _unidentifiedColor;
             }
             else
             {
                 _inventoryImages[i].sprite = null;
                 _inventoryTexts[i].text = string.Empty;
+                _identifyImage[i].color = Color.clear;
             }
         }
 

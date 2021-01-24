@@ -8,7 +8,5 @@
 
     public enum QUICK_SLOT { CAPACITY = 4 };
 
-    public enum SUPPLIES { HEALING, SUPPLIES_END };
-
-    public enum SCROLL { ENCHANT, IDENTIFY, SCROLL_END };
+    public enum SUPPLIES { HEALING_POTION, IDENTIFY_SCROLL, ENCHANT_SCROLL, SUPPLIES_END };
 }

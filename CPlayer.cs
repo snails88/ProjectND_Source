@@ -261,11 +261,11 @@ public abstract class CPlayer : CCreature
     {
         switch (((CSupplies)Inventory[InvenIdx]).Sort)
         {
-            case SUPPLIES.HEALING:
+            case SUPPLIES.HEALING_POTION:
                 {
                     if (((CSupplies)Inventory[InvenIdx]).Count > 0)
                     {
-                        if (_hP < _maxHP)
+                        if (_hP < _maxHP || !Inventory[InvenIdx].Identified)
                         {
                             _hP += _maxHP * 0.5f;
                             if (_hP > _maxHP)
@@ -276,6 +276,8 @@ public abstract class CPlayer : CCreature
                                 Destroy(Inventory[InvenIdx].gameObject);
                                 Inventory[InvenIdx] = null;
                             }
+                            if (!Inventory[InvenIdx].Identified)
+                                Inventory[InvenIdx].Identified = true;
                             CUIManager._instance.RefreshInventory();
                         }
                     }
@@ -319,6 +321,9 @@ public abstract class CPlayer : CCreature
         // 무기바꾸면 무기공격속도 적용
         if (equipIdx == (int)EQUIP_SLOT.WEAPON)
             _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)Equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
+
+        if (!Equips[equipIdx].Identified)
+            Equips[equipIdx].Identified = true;
     }
 
     protected bool SwapEquipToInventory(int equipIdx, int invenIdx)

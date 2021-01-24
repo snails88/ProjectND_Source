@@ -8,6 +8,7 @@ public abstract class ACItem : MonoBehaviour, IInteractionObject
 
     // 인벤에 무기레벨이랑 포션개수 묶어서 사용
     public abstract int InventoryExpress { get; }
+    public abstract bool Identified { get; set; }
 
     public abstract void UseItem(int InvenIdx);
     public abstract void Interaction();
