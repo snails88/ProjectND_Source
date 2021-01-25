@@ -26,6 +26,10 @@ public class CUIManager : MonoBehaviour
     public GameObject HPBarPrefab { get { return _hPBarPrefab; } }
     public int MouseOverIndex { get; protected set; } = -1;
 
+    // 식별, 저주해제 등 사용시
+    public bool UseSupplies { get; set; }
+    public SUPPLIES UsedSuplly { get; set; }
+
     private void Awake()
     {
         if (!_instance)
@@ -94,6 +98,12 @@ public class CUIManager : MonoBehaviour
         }
     }
 
+    public void PopUpInventoryAlways()
+    {
+        _UIInventory.SetActive(true);
+        CGameManager._instance.SetTimeScale(0f);
+    }
+
     public void RefreshInventory()
     {
         for (int i = 0; i < (int)INVENTORY.CAPACITY; i++)
@@ -143,7 +153,17 @@ public class CUIManager : MonoBehaviour
 
     public void UseItem(int invenIdx)
     {
-        _player.UseItem(invenIdx);
+        if (!UseSupplies)
+            _player.UseItem(invenIdx);
+        else
+        {
+            switch(UsedSuplly)
+            {
+                case SUPPLIES.IDENTIFY_SCROLL:
+                    _player.IdentifyItem(invenIdx);
+                    break;
+            }
+        }
     }
 
     public void UseQuickSlotItem(int quickSlotIdx)

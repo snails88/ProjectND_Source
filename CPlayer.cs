@@ -259,31 +259,46 @@ public abstract class CPlayer : CCreature
 
     public void UseSupplies(int InvenIdx)
     {
+        if (((CSupplies)Inventory[InvenIdx]).Count <= 0)
+            return;
+
         switch (((CSupplies)Inventory[InvenIdx]).Sort)
         {
             case SUPPLIES.HEALING_POTION:
                 {
-                    if (((CSupplies)Inventory[InvenIdx]).Count > 0)
+                    if (_hP < _maxHP || !Inventory[InvenIdx].Identified)
                     {
-                        if (_hP < _maxHP || !Inventory[InvenIdx].Identified)
-                        {
-                            _hP += _maxHP * 0.5f;
-                            if (_hP > _maxHP)
-                                _hP = _maxHP;
-                            --((CSupplies)Inventory[InvenIdx]).Count;
-                            if (((CSupplies)Inventory[InvenIdx]).Count == 0)
-                            {
-                                Destroy(Inventory[InvenIdx].gameObject);
-                                Inventory[InvenIdx] = null;
-                            }
-                            if (!Inventory[InvenIdx].Identified)
-                                Inventory[InvenIdx].Identified = true;
-                            CUIManager._instance.RefreshInventory();
-                        }
+                        _hP += _maxHP * 0.5f;
+                        if (_hP > _maxHP)
+                            _hP = _maxHP;
                     }
                 }
                 break;
+            case SUPPLIES.IDENTIFY_SCROLL:
+                {
+                    CUIManager._instance.PopUpInventoryAlways();
+                    CUIManager._instance.UseSupplies = true;
+                    CUIManager._instance.UsedSuplly = SUPPLIES.IDENTIFY_SCROLL;
+                }
+                break;
         }
+        if (!Inventory[InvenIdx].Identified)
+            Inventory[InvenIdx].Identified = true;
+        --((CSupplies)Inventory[InvenIdx]).Count;
+        if (((CSupplies)Inventory[InvenIdx]).Count == 0)
+        {
+            Destroy(Inventory[InvenIdx].gameObject);
+            Inventory[InvenIdx] = null;
+        }
+        CUIManager._instance.RefreshInventory();
+    }
+
+    public void IdentifyItem(int InvenIdx)
+    {
+        if (!Inventory[InvenIdx].Identified)
+            Inventory[InvenIdx].Identified = true;
+        CUIManager._instance.RefreshInventory();
+        CUIManager._instance.UseSupplies = false;
     }
 
     public void ReleaseEquip(int equipIdx)
