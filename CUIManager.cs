@@ -162,6 +162,9 @@ public class CUIManager : MonoBehaviour
                 case SUPPLIES.IDENTIFY_SCROLL:
                     _player.IdentifyItem(invenIdx);
                     break;
+                case SUPPLIES.ENCHANT_SCROLL:
+                    _player.EnchantItem(invenIdx);
+                    break;
             }
         }
     }

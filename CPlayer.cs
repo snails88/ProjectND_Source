@@ -281,6 +281,13 @@ public abstract class CPlayer : CCreature
                     CUIManager._instance.UsedSuplly = SUPPLIES.IDENTIFY_SCROLL;
                 }
                 break;
+            case SUPPLIES.ENCHANT_SCROLL:
+                {
+                    CUIManager._instance.PopUpInventoryAlways();
+                    CUIManager._instance.UseSupplies = true;
+                    CUIManager._instance.UsedSuplly = SUPPLIES.ENCHANT_SCROLL;
+                }
+                break;
         }
         if (!Inventory[InvenIdx].Identified)
             Inventory[InvenIdx].Identified = true;
@@ -297,6 +304,13 @@ public abstract class CPlayer : CCreature
     {
         if (!Inventory[InvenIdx].Identified)
             Inventory[InvenIdx].Identified = true;
+        CUIManager._instance.RefreshInventory();
+        CUIManager._instance.UseSupplies = false;
+    }
+
+    public void EnchantItem(int InvenIdx)
+    {
+        ((CEquipment)Inventory[InvenIdx]).Enchant();
         CUIManager._instance.RefreshInventory();
         CUIManager._instance.UseSupplies = false;
     }

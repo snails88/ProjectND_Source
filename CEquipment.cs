@@ -5,15 +5,11 @@ using Constants;
 
 public class CEquipment : ACItem
 {
-    [SerializeField] private EQUIP_SLOT _equipSlot;
-    private int _lv = 1;
-    private bool _identified = false;
+    [SerializeField] protected EQUIP_SLOT _equipSlot;
+    protected int _lv = 1;
+    protected bool _identified = false;
 
-    public int Lv
-    {
-        get { return _lv; }
-        set { _lv = value; }
-    }
+    public int Lv { get { return _lv; } set { _lv = value; } }
     public EQUIP_SLOT EquipSlot { get { return _equipSlot; } }
     public bool Cursed { get; protected set; }
     public override int InventoryExpress { get { return _lv; } }
@@ -28,5 +24,10 @@ public class CEquipment : ACItem
     {
         _player.EquipItem(InvenIdx);
         CUIManager._instance.RefreshInventory();
+    }
+
+    public virtual void Enchant()
+    {
+
     }
 }

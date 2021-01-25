@@ -13,7 +13,7 @@ public abstract class ACItem : MonoBehaviour, IInteractionObject
     public abstract void UseItem(int InvenIdx);
     public abstract void Interaction();
 
-    protected void Awake()
+    protected virtual void Awake()
     {
         _player = GameObject.FindWithTag("Player").GetComponent<CPlayer>();
     }
