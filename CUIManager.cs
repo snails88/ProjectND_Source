@@ -176,7 +176,20 @@ public class CUIManager : MonoBehaviour
 
     public void ReleaseEquip(int equipIdx)
     {
-        _player.ReleaseEquip(equipIdx);
+        if (UseSupplies)
+        {
+            switch (UsedSuplly)
+            {
+                case SUPPLIES.IDENTIFY_SCROLL:
+                    _player.IdentifyItemOnEquip(equipIdx);
+                    break;
+                case SUPPLIES.ENCHANT_SCROLL:
+                    _player.EnchantItemOnEquip(equipIdx);
+                    break;
+            }
+        }
+        else
+            _player.ReleaseEquip(equipIdx);
     }
 
     public void OnMouseOverEquip(int index)

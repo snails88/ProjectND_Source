@@ -40,6 +40,7 @@ public abstract class CPlayer : CCreature
     protected Transform _equipTransform;
     protected CHitStop _hitStop;
     protected CCamera _camera;
+    private int _itemCount;
 
     public float HP { get { return _hP; } }
     public float MaxHP { get { return _maxHP; } }
@@ -257,16 +258,16 @@ public abstract class CPlayer : CCreature
         }
     }
 
-    public void UseSupplies(int InvenIdx)
+    public void UseSupplies(int invenIdx)
     {
-        if (((CSupplies)Inventory[InvenIdx]).Count <= 0)
+        if (((CSupplies)Inventory[invenIdx]).Count <= 0)
             return;
 
-        switch (((CSupplies)Inventory[InvenIdx]).Sort)
+        switch (((CSupplies)Inventory[invenIdx]).Sort)
         {
             case SUPPLIES.HEALING_POTION:
                 {
-                    if (_hP < _maxHP || !Inventory[InvenIdx].Identified)
+                    if (_hP < _maxHP || !Inventory[invenIdx].Identified)
                     {
                         _hP += _maxHP * 0.5f;
                         if (_hP > _maxHP)
@@ -277,42 +278,127 @@ public abstract class CPlayer : CCreature
             case SUPPLIES.IDENTIFY_SCROLL:
                 {
                     CUIManager._instance.PopUpInventoryAlways();
-                    CUIManager._instance.UseSupplies = true;
-                    CUIManager._instance.UsedSuplly = SUPPLIES.IDENTIFY_SCROLL;
+                    _itemCount = 0;
+                    for (int i = 0; i < Inventory.Length; i++)
+                    {
+                        if (i == invenIdx)
+                            continue;
+                        if(Inventory[i] != null)
+                        {
+                            ++_itemCount;
+                            break;
+                        }
+                    }
+                    if (_itemCount == 0)
+                    {
+                        for (int i = 0; i < Equips.Length; i++)
+                        {
+                            if (i == invenIdx)
+                                continue;
+                            if (Equips[i] != null)
+                            {
+                                ++_itemCount;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (_itemCount > 0)
+                    {
+                        CUIManager._instance.UseSupplies = true;
+                        CUIManager._instance.UsedSuplly = SUPPLIES.IDENTIFY_SCROLL;
+                    }
                 }
                 break;
             case SUPPLIES.ENCHANT_SCROLL:
                 {
                     CUIManager._instance.PopUpInventoryAlways();
-                    CUIManager._instance.UseSupplies = true;
-                    CUIManager._instance.UsedSuplly = SUPPLIES.ENCHANT_SCROLL;
+                    _itemCount = 0;
+                    for (int i = 0; i < Inventory.Length; i++)
+                    {
+                        if (i == invenIdx)
+                            continue;
+                        if (Inventory[i] != null)
+                        {
+                            ++_itemCount;
+                            break;
+                        }
+                    }
+                    if (_itemCount == 0)
+                    {
+                        for (int i = 0; i < Equips.Length; i++)
+                        {
+                            if (i == invenIdx)
+                                continue;
+                            if (Equips[i] != null)
+                            {
+                                ++_itemCount;
+                                break;
+                            }
+                        }
+                    }
+                    if (_itemCount > 0)
+                    {
+                        CUIManager._instance.UseSupplies = true;
+                        CUIManager._instance.UsedSuplly = SUPPLIES.ENCHANT_SCROLL;
+                    }
                 }
                 break;
         }
-        if (!Inventory[InvenIdx].Identified)
-            Inventory[InvenIdx].Identified = true;
-        --((CSupplies)Inventory[InvenIdx]).Count;
-        if (((CSupplies)Inventory[InvenIdx]).Count == 0)
+        if (!Inventory[invenIdx].Identified)
+            Inventory[invenIdx].Identified = true;
+        --((CSupplies)Inventory[invenIdx]).Count;
+        if (((CSupplies)Inventory[invenIdx]).Count == 0)
         {
-            Destroy(Inventory[InvenIdx].gameObject);
-            Inventory[InvenIdx] = null;
+            Destroy(Inventory[invenIdx].gameObject);
+            Inventory[invenIdx] = null;
         }
         CUIManager._instance.RefreshInventory();
     }
 
-    public void IdentifyItem(int InvenIdx)
+    public void IdentifyItem(int invenIdx)
     {
-        if (!Inventory[InvenIdx].Identified)
-            Inventory[InvenIdx].Identified = true;
-        CUIManager._instance.RefreshInventory();
-        CUIManager._instance.UseSupplies = false;
+        if (Inventory[invenIdx])
+        {
+            if (!Inventory[invenIdx].Identified)
+                Inventory[invenIdx].Identified = true;
+            CUIManager._instance.RefreshInventory();
+            CUIManager._instance.UseSupplies = false;
+        }
     }
 
-    public void EnchantItem(int InvenIdx)
+    public void EnchantItem(int invenIdx)
     {
-        ((CEquipment)Inventory[InvenIdx]).Enchant();
-        CUIManager._instance.RefreshInventory();
-        CUIManager._instance.UseSupplies = false;
+        if (Inventory[invenIdx])
+        {
+            if (Inventory[invenIdx] is CEquipment)
+                ((CEquipment)Inventory[invenIdx]).Enchant();
+            CUIManager._instance.RefreshInventory();
+            CUIManager._instance.UseSupplies = false;
+        }
+    }
+
+    public void IdentifyItemOnEquip(int equipIdx)
+    {
+        if (Equips[equipIdx])
+        {
+            if (!Equips[equipIdx].Identified)
+                Equips[equipIdx].Identified = true;
+            CUIManager._instance.RefreshInventory();
+            CUIManager._instance.UseSupplies = false;
+        }
+    }
+
+    public void EnchantItemOnEquip(int equipIdx)
+    {
+        if (Equips[equipIdx])
+        {
+            Equips[equipIdx].Enchant();
+            if (equipIdx == (int)EQUIP_SLOT.WEAPON)
+                _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed);
+            CUIManager._instance.RefreshInventory();
+            CUIManager._instance.UseSupplies = false;
+        }
     }
 
     public void ReleaseEquip(int equipIdx)
