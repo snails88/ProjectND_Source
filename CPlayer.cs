@@ -478,6 +478,25 @@ public abstract class CPlayer : CCreature
         QuickSlots[quickSlotIdx] = null;
     }
 
+    public void DropItem(int startIdx)
+    {
+        if(startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
+        {
+            Equips[startIdx].gameObject.SetActive(true);
+            Equips[startIdx].transform.parent = null;
+            Equips[startIdx].transform.position = transform.position;
+            Equips[startIdx] = null;
+        }
+        else
+        {
+            startIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END;
+            Inventory[startIdx].gameObject.SetActive(true);
+            Inventory[startIdx].transform.parent = null;
+            Inventory[startIdx].transform.position = transform.position;
+            Inventory[startIdx] = null;
+        }    
+    }
+
     public bool DragItemSlot(int startIdx, int destIdx)
     {
         if(startIdx >= (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)

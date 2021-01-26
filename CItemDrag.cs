@@ -72,16 +72,25 @@ public class CItemDrag : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDra
     {
         if(_drag)
         {
-            print(CUIManager._instance.MouseOverIndex);
-            if (CUIManager._instance.MouseOverIndex > -1 && _startIndex != CUIManager._instance.MouseOverIndex)
+            if(CUIManager._instance.MouseOverIndex == -1)
             {
-                if (_player.DragItemSlot(_startIndex, CUIManager._instance.MouseOverIndex))
-                    CUIManager._instance.RefreshInventory();
-            }
-            else if (CUIManager._instance.MouseOverIndex == -1 && _startIndex >= (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
-            {
-                _player.RemoveItemFromQuickSlot(_startIndex - (int)EQUIP_SLOT.EQUIP_SLOT_END - (int)INVENTORY.CAPACITY);
+                if(_startIndex >= (int)EQUIP_SLOT.EQUIP_SLOT_END + (int)INVENTORY.CAPACITY)
+                {
+                    _player.RemoveItemFromQuickSlot(_startIndex - (int)EQUIP_SLOT.EQUIP_SLOT_END - (int)INVENTORY.CAPACITY);
+                }
+                else
+                {
+                    _player.DropItem(_startIndex);
+                }
                 CUIManager._instance.RefreshInventory();
+            }
+            else
+            {
+                if(_startIndex != CUIManager._instance.MouseOverIndex)
+                {
+                    if (_player.DragItemSlot(_startIndex, CUIManager._instance.MouseOverIndex))
+                        CUIManager._instance.RefreshInventory();
+                }
             }
             _drag = false;
             _image.raycastTarget = true;
