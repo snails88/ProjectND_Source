@@ -403,6 +403,10 @@ public abstract class CPlayer : CCreature
 
     public void ReleaseEquip(int equipIdx)
     {
+        // 메세지 박스 넣기
+        if (Equips[equipIdx].Cursed)
+            return;
+
         if(AddItemToInventory(Equips[equipIdx]))
         {
             Equips[equipIdx] = null;
@@ -417,6 +421,10 @@ public abstract class CPlayer : CCreature
         int equipIdx = (int)((CEquipment)Inventory[invenIdx]).EquipSlot;
         if (Equips[equipIdx])
         {
+            // 메세지 박스 넣기
+            if (Equips[equipIdx].Cursed)
+                return;
+
             if (Inventory[invenIdx] is CEquipment)
             {
                 ACItem temp = Equips[equipIdx];
@@ -443,6 +451,10 @@ public abstract class CPlayer : CCreature
 
     protected bool SwapEquipToInventory(int equipIdx, int invenIdx)
     {
+        // 메세지 박스 넣기
+        if (Equips[equipIdx].Cursed)
+            return false;
+
         if (Inventory[invenIdx] is CEquipment)
         {
             if ((int)((CEquipment)Inventory[invenIdx]).EquipSlot == equipIdx)
@@ -553,6 +565,10 @@ public abstract class CPlayer : CCreature
             // 시작 아이템이 장비슬롯에있으면
             if (startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
             {
+                // 메세지 박스 넣기
+                if (Equips[startIdx].Cursed)
+                    return false;
+
                 if(!Inventory[destIdx])
                 {
                     Inventory[destIdx] = Equips[startIdx];
@@ -587,6 +603,25 @@ public abstract class CPlayer : CCreature
         // 목표아이템이 퀵슬롯에 있으면
         else
         {
+            if (startIdx < (int)EQUIP_SLOT.EQUIP_SLOT_END)
+            {
+                // 메세지 박스 넣기
+                if (Equips[startIdx].Cursed)
+                    return false;
+            }
+            else
+            {
+                startIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END;
+                // 메세지 박스 넣기
+                if (!Inventory[startIdx].Identified)
+                    return false;
+                // 메세지 박스 넣기
+                if (Inventory[startIdx] is CEquipment)
+                {
+                    if (((CEquipment)Inventory[startIdx]).Cursed)
+                        return false;
+                }
+            }
             RegisterItemToQuickSlot(startIdx, destIdx - (int)EQUIP_SLOT.EQUIP_SLOT_END - (int)INVENTORY.CAPACITY);
             return true;
         }

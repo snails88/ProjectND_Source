@@ -21,6 +21,7 @@ public class CUIManager : MonoBehaviour
     private Image _playerResourceProgressBar;
     private CPlayer _player;
     private Color _unidentifiedColor = new Color(1f, 0.5f, 0.5f, 0.5f);
+    private Color _cursedColor = new Color(1f, 0f, 1f, 1f);
     private Queue<GameObject> _hPBarPool = new Queue<GameObject>();
     
     public GameObject HPBarPrefab { get { return _hPBarPrefab; } }
@@ -110,28 +111,49 @@ public class CUIManager : MonoBehaviour
         {
             if (_player.Inventory[i])
             {
-                _inventoryImages[i].sprite = _player.Inventory[i].gameObject.transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
+                _inventoryImages[i].sprite = _player.Inventory[i].transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
                 _inventoryTexts[i].text = _player.Inventory[i].InventoryExpress.ToString();
-                _identifyImage[i].color = _player.Inventory[i].Identified ? Color.clear : _unidentifiedColor;
+                if (_player.Inventory[i].Identified)
+                {
+                    _identifyImage[i].color = Color.clear;
+                    if (_player.Inventory[i] is CEquipment)
+                    {
+                        if (((CEquipment)_player.Inventory[i]).Cursed)
+                            _inventoryImages[i].color = _cursedColor;
+                        else
+                            _inventoryImages[i].color = Color.white;
+                    }
+                }
+                else
+                {
+                    _identifyImage[i].color = _unidentifiedColor;
+                }
             }
             else
             {
                 _inventoryImages[i].sprite = null;
+                _inventoryImages[i].color = Color.white;
                 _inventoryTexts[i].text = string.Empty;
                 _identifyImage[i].color = Color.clear;
             }
+            
         }
 
         for (int i = 0; i < (int)EQUIP_SLOT.EQUIP_SLOT_END; i++)
         {
             if (_player.Equips[i])
             {
-                _equipImages[i].sprite = _player.Equips[i].gameObject.transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
+                _equipImages[i].sprite = _player.Equips[i].transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
                 _equipTexts[i].text = _player.Equips[i].Lv.ToString();
+                if (_player.Equips[i].Cursed)
+                    _equipImages[i].color = _cursedColor;
+                else
+                    _equipImages[i].color = Color.white;
             }
             else
             {
                 _equipImages[i].sprite = null;
+                _equipImages[i].color = Color.white;
                 _equipTexts[i].text = string.Empty;
             }
         }
@@ -140,12 +162,20 @@ public class CUIManager : MonoBehaviour
         {
             if (_player.QuickSlots[i])
             {
-                _quickSlotImages[i].sprite = _player.QuickSlots[i].gameObject.transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
+                _quickSlotImages[i].sprite = _player.QuickSlots[i].transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
                 _quickSlotTexts[i].text = _player.QuickSlots[i].InventoryExpress.ToString();
+                //if (_player.QuickSlots[i] is CEquipment)
+                //{
+                //    if (((CEquipment)_player.QuickSlots[i]).Cursed)
+                //        _quickSlotImages[i].color = _cursedColor;
+                //    else
+                //        _quickSlotImages[i].color = Color.white;
+                //}
             }
             else
             {
                 _quickSlotImages[i].sprite = null;
+                //_quickSlotImages[i].color = Color.white;
                 _quickSlotTexts[i].text = string.Empty;
             }
         }

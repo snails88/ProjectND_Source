@@ -15,6 +15,12 @@ public class CEquipment : ACItem
     public override int InventoryExpress { get { return _lv; } }
     public override bool Identified { get { return _identified; } set { _identified = value; } }
 
+    protected override void Awake()
+    {
+        base.Awake();
+        Cursed = Random.Range(0, 10) <= 1 ? true : false;
+    }
+
     public override void Interaction()
     {
         _player.AddItemToInventory(this);
