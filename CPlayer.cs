@@ -611,9 +611,8 @@ public abstract class CPlayer : CCreature
             }
             else
             {
-                startIdx -= (int)EQUIP_SLOT.EQUIP_SLOT_END;
                 // 메세지 박스 넣기
-                if (!Inventory[startIdx].Identified)
+                if (!Inventory[startIdx - (int)EQUIP_SLOT.EQUIP_SLOT_END].Identified)
                     return false;
                 // 메세지 박스 넣기
                 if (Inventory[startIdx] is CEquipment)
