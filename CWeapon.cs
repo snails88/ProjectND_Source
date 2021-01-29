@@ -25,8 +25,21 @@ public class CWeapon : CEquipment
     public override void Enchant()
     {
         base.Enchant();
-        WeaponAttackSpeed = _initAttackSpeed + (_lv * _attackSpeedGrowth);
-        Damage = _initDamage + (_lv * _damageGrowth);
+        CalculateWeaponStat();
         ++_lv;
+    }
+
+    public void CalculateWeaponStat()
+    {
+        if (!Cursed)
+        {
+            WeaponAttackSpeed = _initAttackSpeed + (_lv * _attackSpeedGrowth);
+            Damage = _initDamage + (_lv * _damageGrowth);
+        }
+        else
+        {
+            WeaponAttackSpeed = _initAttackSpeed;
+            Damage = _initDamage;
+        }
     }
 }

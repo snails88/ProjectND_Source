@@ -36,4 +36,9 @@ public class CEquipment : ACItem
     {
 
     }
+
+    public void SetCurse(bool curse)
+    {
+        Cursed = curse;
+    }
 }

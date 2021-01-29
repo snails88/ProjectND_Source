@@ -164,18 +164,10 @@ public class CUIManager : MonoBehaviour
             {
                 _quickSlotImages[i].sprite = _player.QuickSlots[i].transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite;
                 _quickSlotTexts[i].text = _player.QuickSlots[i].InventoryExpress.ToString();
-                //if (_player.QuickSlots[i] is CEquipment)
-                //{
-                //    if (((CEquipment)_player.QuickSlots[i]).Cursed)
-                //        _quickSlotImages[i].color = _cursedColor;
-                //    else
-                //        _quickSlotImages[i].color = Color.white;
-                //}
             }
             else
             {
                 _quickSlotImages[i].sprite = null;
-                //_quickSlotImages[i].color = Color.white;
                 _quickSlotTexts[i].text = string.Empty;
             }
         }
@@ -194,6 +186,9 @@ public class CUIManager : MonoBehaviour
                     break;
                 case SUPPLIES.ENCHANT_SCROLL:
                     _player.EnchantItem(invenIdx);
+                    break;
+                case SUPPLIES.REMOVECURSE_SCROLL:
+                    _player.RemoveCurseItem(invenIdx);
                     break;
             }
         }
@@ -215,6 +210,9 @@ public class CUIManager : MonoBehaviour
                     break;
                 case SUPPLIES.ENCHANT_SCROLL:
                     _player.EnchantItemOnEquip(equipIdx);
+                    break;
+                case SUPPLIES.REMOVECURSE_SCROLL:
+                    _player.RemoveCurseItemOnEquip(equipIdx);
                     break;
             }
         }

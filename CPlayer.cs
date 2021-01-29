@@ -276,6 +276,8 @@ public abstract class CPlayer : CCreature
                 }
                 break;
             case SUPPLIES.IDENTIFY_SCROLL:
+            case SUPPLIES.ENCHANT_SCROLL:
+            case SUPPLIES.REMOVECURSE_SCROLL:
                 {
                     CUIManager._instance.PopUpInventoryAlways();
                     _itemCount = 0;
@@ -306,41 +308,7 @@ public abstract class CPlayer : CCreature
                     if (_itemCount > 0)
                     {
                         CUIManager._instance.UseSupplies = true;
-                        CUIManager._instance.UsedSuplly = SUPPLIES.IDENTIFY_SCROLL;
-                    }
-                }
-                break;
-            case SUPPLIES.ENCHANT_SCROLL:
-                {
-                    CUIManager._instance.PopUpInventoryAlways();
-                    _itemCount = 0;
-                    for (int i = 0; i < Inventory.Length; i++)
-                    {
-                        if (i == invenIdx)
-                            continue;
-                        if (Inventory[i] != null)
-                        {
-                            ++_itemCount;
-                            break;
-                        }
-                    }
-                    if (_itemCount == 0)
-                    {
-                        for (int i = 0; i < Equips.Length; i++)
-                        {
-                            if (i == invenIdx)
-                                continue;
-                            if (Equips[i] != null)
-                            {
-                                ++_itemCount;
-                                break;
-                            }
-                        }
-                    }
-                    if (_itemCount > 0)
-                    {
-                        CUIManager._instance.UseSupplies = true;
-                        CUIManager._instance.UsedSuplly = SUPPLIES.ENCHANT_SCROLL;
+                        CUIManager._instance.UsedSuplly = ((CSupplies)Inventory[invenIdx]).Sort;
                     }
                 }
                 break;
@@ -378,6 +346,17 @@ public abstract class CPlayer : CCreature
         }
     }
 
+    public void RemoveCurseItem(int invenIdx)
+    {
+        if (Inventory[invenIdx])
+        {
+            if (Inventory[invenIdx] is CEquipment)
+                ((CEquipment)Inventory[invenIdx]).SetCurse(false);
+            CUIManager._instance.RefreshInventory();
+            CUIManager._instance.UseSupplies = false;
+        }
+    }
+
     public void IdentifyItemOnEquip(int equipIdx)
     {
         if (Equips[equipIdx])
@@ -395,7 +374,22 @@ public abstract class CPlayer : CCreature
         {
             Equips[equipIdx].Enchant();
             if (equipIdx == (int)EQUIP_SLOT.WEAPON)
-                _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed);
+                _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)Equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
+            CUIManager._instance.RefreshInventory();
+            CUIManager._instance.UseSupplies = false;
+        }
+    }
+
+    public void RemoveCurseItemOnEquip(int equipIdx)
+    {
+        if (Equips[equipIdx])
+        {
+            Equips[equipIdx].SetCurse(false);
+            if (equipIdx == (int)EQUIP_SLOT.WEAPON)
+            {
+                ((CWeapon)Equips[equipIdx]).CalculateWeaponStat();
+                _attack.WaitAttack = new WaitForSeconds(_attack.AttackSpeed + ((CWeapon)Equips[(int)EQUIP_SLOT.WEAPON]).WeaponAttackSpeed);
+            }
             CUIManager._instance.RefreshInventory();
             CUIManager._instance.UseSupplies = false;
         }
