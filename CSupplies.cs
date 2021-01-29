@@ -13,6 +13,14 @@ public class CSupplies : ACItem
     public override int InventoryExpress { get { return Count; } }
     public override bool Identified { get { return _identified[(int)_sort]; } set { _identified[(int)_sort] = value; } }
 
+    private void Start()
+    {
+        if ((int)_sort < (int)SUPPLIES.POTION_END)
+            transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite = CGameManager._instance.PotionSpriteList[(int)_sort];
+        else
+            transform.Find("Graphic").GetComponent<SpriteRenderer>().sprite = CGameManager._instance.ScrollSpriteList[(int)_sort - (int)SUPPLIES.POTION_END];
+    }
+
     public override void UseItem(int InvenIdx)
     {
         _player.UseSupplies(InvenIdx);
