@@ -40,7 +40,6 @@ public abstract class CPlayer : CCreature
     protected Transform _equipTransform;
     protected CHitStop _hitStop;
     protected CCamera _camera;
-    private int _itemCount;
 
     public float HP { get { return _hP; } }
     public float MaxHP { get { return _maxHP; } }
@@ -280,18 +279,18 @@ public abstract class CPlayer : CCreature
             case SUPPLIES.REMOVECURSE_SCROLL:
                 {
                     CUIManager._instance.PopUpInventoryAlways();
-                    _itemCount = 0;
+                    int itemCount = 0;
                     for (int i = 0; i < Inventory.Length; i++)
                     {
                         if (i == invenIdx)
                             continue;
                         if(Inventory[i] != null)
                         {
-                            ++_itemCount;
+                            ++itemCount;
                             break;
                         }
                     }
-                    if (_itemCount == 0)
+                    if (itemCount == 0)
                     {
                         for (int i = 0; i < Equips.Length; i++)
                         {
@@ -299,13 +298,13 @@ public abstract class CPlayer : CCreature
                                 continue;
                             if (Equips[i] != null)
                             {
-                                ++_itemCount;
+                                ++itemCount;
                                 break;
                             }
                         }
                     }
 
-                    if (_itemCount > 0)
+                    if (itemCount > 0)
                     {
                         CUIManager._instance.UseSupplies = true;
                         CUIManager._instance.UsedSuplly = ((CSupplies)Inventory[invenIdx]).Sort;

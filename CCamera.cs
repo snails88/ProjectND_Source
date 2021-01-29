@@ -11,16 +11,10 @@ public class CCamera : MonoBehaviour
     [SerializeField] private float _limitMoveRatio;
     private WaitForSeconds _waitShake;
     private Transform _playerTransform;
-    private Vector3 _playerScreenPosition;
     private Vector3 _shakeDir;
-    private Vector3 _mousePos;
-    private Vector3 _conditionalPositionVector;
-    private Vector3 _playerToCameraDir;
-    private Vector3 _zeroToMouseDir;
     private Vector3 _beforeShakePosition;
     private float _shakeForce;
     private float _halfResolutionWidth;
-    private float _moveRatio;
     private bool _shake = false;
 
     private void Awake()
@@ -42,26 +36,26 @@ public class CCamera : MonoBehaviour
 
     private void Move()
     {
-        _mousePos = Input.mousePosition;
-        _playerScreenPosition = Camera.main.WorldToScreenPoint(_playerTransform.position);
-        _mousePos.z = _playerScreenPosition.z;
-        _moveRatio = (_playerScreenPosition - _mousePos).magnitude / (_halfResolutionWidth) * _moveRatioPow;
-        _mousePos = Camera.main.ScreenToWorldPoint(_mousePos);
-        _conditionalPositionVector = _shake ? _beforeShakePosition : transform.position;
-        _conditionalPositionVector.z = _playerTransform.position.z;
-        _zeroToMouseDir = _mousePos - _conditionalPositionVector;
+        Vector3 mousePos = Input.mousePosition;
+        Vector3 playerScreenPosition = Camera.main.WorldToScreenPoint(_playerTransform.position);
+        mousePos.z = playerScreenPosition.z;
+        float moveRatio = (playerScreenPosition - mousePos).magnitude / (_halfResolutionWidth) * _moveRatioPow;
+        mousePos = Camera.main.ScreenToWorldPoint(mousePos);
+        Vector3 conditionalPositionVector = _shake ? _beforeShakePosition : transform.position;
+        conditionalPositionVector.z = _playerTransform.position.z;
+        Vector3 zeroToMouseDir = mousePos - conditionalPositionVector;
 
-        if (_moveRatio > _limitMoveRatio)
-            _moveRatio = _limitMoveRatio;
+        if (moveRatio > _limitMoveRatio)
+            moveRatio = _limitMoveRatio;
 
-        _conditionalPositionVector += _zeroToMouseDir.normalized * Time.deltaTime * _scrollSpeed;
-        _playerToCameraDir = _conditionalPositionVector - _playerTransform.position;
-        if (_playerToCameraDir.magnitude / _limitPlayerToCameraDistance > _moveRatio)
+        conditionalPositionVector += zeroToMouseDir.normalized * Time.deltaTime * _scrollSpeed;
+        Vector3 playerToCameraDir = conditionalPositionVector - _playerTransform.position;
+        if (playerToCameraDir.magnitude / _limitPlayerToCameraDistance > moveRatio)
         {
-            _conditionalPositionVector = _playerTransform.position + _playerToCameraDir.normalized * _limitPlayerToCameraDistance * _moveRatio;
+            conditionalPositionVector = _playerTransform.position + playerToCameraDir.normalized * _limitPlayerToCameraDistance * moveRatio;
         }
-        _conditionalPositionVector.z = -10f;
-        transform.position = _conditionalPositionVector;
+        conditionalPositionVector.z = -10f;
+        transform.position = conditionalPositionVector;
     }
 
     public void SetShakeTime(float shakeTime)

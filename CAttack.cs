@@ -14,13 +14,14 @@ public class CAttack : MonoBehaviour
     private CCreature _owner;
     private Transform _prototypeGraphicTransform;
     private WaitForSeconds _wait;
+    private string _graphic = "Graphic";
 
     public float Damage { get; set; }
 
     private void Awake()
     {
         _objectPoolObject = GameObject.Find("AttackObjectPool");
-        _graphicObject = transform.Find("Graphic").gameObject;
+        _graphicObject = transform.Find(_graphic).gameObject;
         _wait = new WaitForSeconds(_lifeTime);
     }
 
@@ -43,7 +44,7 @@ public class CAttack : MonoBehaviour
     public void SetAttack(PROTOTYPE_ATTACK prototype, float dmg, in CCreature owner)
     {
         _prototypePrefab = CGameManager._instance.GetAttackObjectPrototype((int)prototype);
-        _prototypeGraphicTransform = _prototypePrefab.transform.Find("Graphic");
+        _prototypeGraphicTransform = _prototypePrefab.transform.Find(_graphic);
         gameObject.layer = _prototypePrefab.layer;
         _graphicObject.transform.localScale = _prototypeGraphicTransform.localScale;
         _graphicObject.GetComponent<SpriteRenderer>().color = _prototypeGraphicTransform.GetComponent<SpriteRenderer>().color;

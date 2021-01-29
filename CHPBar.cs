@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class CHPBar : MonoBehaviour
 {
-    private Vector3 _ownerPos;
     private Image _image;
 
     public float AddYValue { protected get; set; }
@@ -25,9 +24,9 @@ public class CHPBar : MonoBehaviour
     {
         if (Owner)
         {
-            _ownerPos = Owner.transform.position;
-            _ownerPos.y += AddYValue;
-            transform.position = Camera.main.WorldToScreenPoint(_ownerPos);
+            Vector3 ownerPos = Owner.transform.position;
+            ownerPos.y += AddYValue;
+            transform.position = Camera.main.WorldToScreenPoint(ownerPos);
         }
     }
 

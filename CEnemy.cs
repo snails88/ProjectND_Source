@@ -15,14 +15,10 @@ public abstract class CEnemy : CCreature
         public WaitForSeconds WaitAfter;
         public WaitForSeconds WaitBefore;
 
-        [HideInInspector]
-        public Vector3 AttackDir;
-        [HideInInspector]
-        public Vector2 AttackPos;
-        [HideInInspector]
-        public float AttackAngle;
-        [HideInInspector]
-        public bool Attacking;
+        [HideInInspector] public Vector3 AttackDir;
+        [HideInInspector] public Vector2 AttackPos;
+        [HideInInspector] public float AttackAngle;
+        [HideInInspector] public bool Attacking;
     }
     [SerializeField] protected AttackVars _attack;
     [SerializeField] protected float _hPBarAddYPos;
