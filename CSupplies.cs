@@ -9,7 +9,7 @@ public class CSupplies : ACItem
     private static bool[] _identified = new bool[(int)SUPPLIES.SUPPLIES_END];
 
     public SUPPLIES Sort{ get { return _sort; } }
-    public int Count { get; set; }
+    public int Count { get; set; } = 1;
     public override int InventoryExpress { get { return Count; } }
     public override bool Identified { get { return _identified[(int)_sort]; } set { _identified[(int)_sort] = value; } }
 

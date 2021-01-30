@@ -205,7 +205,7 @@ public abstract class CPlayer : CCreature
             {
                 if(((CSupplies)Inventory[i]).Sort == item.Sort)
                 {
-                    ++((CSupplies)Inventory[i]).Count;
+                    ((CSupplies)Inventory[i]).Count += item.Count;
                     Destroy(item.gameObject);
                     CUIManager._instance.RefreshInventory();
                     return true;
@@ -217,7 +217,6 @@ public abstract class CPlayer : CCreature
         if (index != -1)
         {
             Inventory[index] = item;
-            ++item.Count;
             item.transform.SetParent(_invenTransform);
             item.gameObject.SetActive(false);
             CUIManager._instance.RefreshInventory();
